@@ -22,9 +22,6 @@ spectrum_var = var(spectrum(1:5,:), 0, 2);
 disp("Variance of each spectrum:");
 disp(spectrum_var)
 
-% smooth outh the signal
-% spectrum_smooth = smoothdata(spectrum, 2, 'movmean', 5);
-
 %% Plotting the signal
 %==========================================================================
 figure( 'Name', "Initial Plot" );
@@ -35,9 +32,17 @@ ylabel('Amplitude (a. u.)');
 title("Signal");
 legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5');
 
-%% Calculate the polynomial fit of the continuum curve
+%% Find the peaks in the spectrum and plot them
 %==========================================================================
+% Find positive peaks in the spectrum
+[peaks,peaksLoc] = findpeaks(spectrum(1,:),'MinPeakProminence',2, 'MinPeakDistance', 0.8, 'MinPeakWidth', 8);
+hold on;
+plot(wavelength(peaksLoc),peaks,'rv','MarkerFaceColor','r');
 
+% Find negative peaks in the spectrum
+[negPeaks,negPeaksLoc] = findpeaks(-spectrum(1,:),'MinPeakProminence',2, 'MinPeakDistance', 0.8, 'MinPeakWidth', 8);
+hold on;
+plot(wavelength(negPeaksLoc),-negPeaks,'gv','MarkerFaceColor','g');
 
 
 %% Plotting the Polynomial Fit
