@@ -57,7 +57,9 @@ for i = 1:num_curves
     poly_eval(i,:) = polyval(coeffs(i,:), wavelength); % Evaluate the fitted curve at the original wavelength values
 end
 
-figure;
+%% Plotting the Polynomial Fit
+%==========================================================================
+figure( 'Name', "Polynomial Fit" );
 hold on;
 for i = 1:num_curves
     plot(wavelength, spectrum(i,:), 'k');

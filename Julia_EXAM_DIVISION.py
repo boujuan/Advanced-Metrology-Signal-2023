@@ -3,9 +3,9 @@ import numpy as np
 
 # ------------------------------------------------------------------------------------------------------------------
 # Reading the files into a NumPy array:
-WL = np.loadtxt("Sig_para_WL_Zimmer.csv", delimiter=",")
+WL = np.loadtxt("Data/Sig_para_WL_Novo.csv", delimiter=",")
 # WL = Wavelength!!
-spec = np.loadtxt("Sig_para_Spec_Zimmer.csv", delimiter=",")
+spec = np.loadtxt("Data/Sig_para_Spec_Novo.csv", delimiter=",")
 #Spec = Spectral Lines!!
 
 
