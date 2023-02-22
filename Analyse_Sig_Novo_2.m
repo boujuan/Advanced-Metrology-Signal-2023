@@ -4,7 +4,7 @@ clc
 
 %% Load data
 %==========================================================================
-load("Sig_para_Novo.mat", "ds_spectrum", "ds_wl_range");
+load("Data/Sig_para_Novo.mat", "ds_spectrum", "ds_wl_range");
 spectrum_off = ds_spectrum;
 wavelength = ds_wl_range;
 
