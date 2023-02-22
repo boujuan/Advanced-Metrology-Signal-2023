@@ -42,7 +42,7 @@ plot(wavelength(peaksLoc),peaks,'rv','MarkerFaceColor','r');
 % Find negative peaks in the spectrum
 [negPeaks,negPeaksLoc] = findpeaks(-spectrum(1,:),'MinPeakProminence',2, 'MinPeakDistance', 0.8, 'MinPeakWidth', 8);
 hold on;
-plot(wavelength(negPeaksLoc),-negPeaks,'gv','MarkerFaceColor','g');
+plot(wavelength(negPeaksLoc),-negPeaks,'g^','MarkerFaceColor','g');
 
 
 %% Plotting the Polynomial Fit
