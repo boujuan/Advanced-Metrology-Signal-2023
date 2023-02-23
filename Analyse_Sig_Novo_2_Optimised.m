@@ -5,15 +5,13 @@ clc
 %% Load data
 %==========================================================================
 load("Data/Sig_para_Novo.mat", "ds_spectrum", "ds_wl_range");
-raw_spectra = ds_spectrum;
+spectogram = ds_spectrum;
 wavelength = ds_wl_range;
 
 %% Analyze the signal
 %==========================================================================
-num_curves = size(raw_spectra, 1);
-% detrending the signal by substracting the means
-% spectrogram = bsxfun(@minus, raw_spectra, mean(raw_spectra, 2));
-spectrogram = raw_spectra; % !!!!!!!!!!!! Left it without detrending due to weird asymptotes happening with correction later
+% define number of curves. Possibly timesteps in the spectograph???***
+num_curves = size(spectogram, 1);
 
 % define timestep (wavelength_resolution in this case) and sampling frequency
 wavelength_resolution = wavelength(2) - wavelength(1);
@@ -64,7 +62,7 @@ for i = 1:numSpectra
 end
 hold off
 
-%% Create the calibration curve
+%% Create the calibration curve by removing peaks from signal
 %==========================================================================
 % Initialize calibration_curve as a copy of spectrogram
 calibration_curve = spectrogram;
