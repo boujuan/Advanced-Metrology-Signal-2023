@@ -12,8 +12,7 @@ wavelength = ds_wl_range;
 %==========================================================================
 num_curves = size(raw_spectra, 1);
 % detrending the signal by substracting the means
-% spectrogram = bsxfun(@minus, raw_spectra, mean(raw_spectra, 2));
-spectrogram = raw_spectra; % !!!!!!!!!!!! Left it without detrending due to weird asymptotes happening with correction later
+spectrogram = bsxfun(@minus, raw_spectra, mean(raw_spectra, 2));
 
 % define timestep (wavelength_resolution in this case) and sampling frequency
 wavelength_resolution = wavelength(2) - wavelength(1);
@@ -36,7 +35,7 @@ legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5');
 %% Find the peaks in the spectrum and plot them
 %==========================================================================
 % Initialize the peak locations and values arrays
-numSpectra = 4; % Only 4 spectra are being corrected because the 5th doesn't follow the curve
+numSpectra = 4;
 maxPeaksPerSpectrum = 10;
 peaks = zeros(numSpectra, maxPeaksPerSpectrum);
 peaksLoc = zeros(numSpectra, maxPeaksPerSpectrum);
@@ -69,7 +68,7 @@ hold off
 % Initialize calibration_curve as a copy of spectrogram
 calibration_curve = spectrogram;
 
-% Define the region around the peaks to set to NaN (0.5 wavelength values left and right)
+% Define the region around the peaks to set to NaN
 region_size = round(0.5 / wavelength_resolution);
 
 for i = 1:numSpectra
@@ -135,38 +134,12 @@ title("Interpolated Calibration Curve");
 %==========================================================================
 x = wavelength;
 y = calibration_curve_interpolated(1,:);
-p = polyfit(x(~isnan(y)), y(~isnan(y)), 5); % fit a 4th-degree polynomial, ignoring NaN values
+p = polyfit(x(~isnan(y)), y(~isnan(y)), 4); % fit a 5th-degree polynomial, ignoring NaN values
 y_fit = polyval(p, x); % evaluate the polynomial at each wavelength
 
 figure( 'Name', "Polynomial Fit" );
-plot(wavelength, spectrogram);
-hold on
-plot(x, y_fit, 'LineWidth',2, 'Color', 'r', 'LineStyle', '--');
+
+plot(x, y_fit);
 title("Polynomial Fit");
-legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5', 'Polynomial Fit');
 
-%% Divide the signal by the polynomial fit to get the corrected signal
-%==========================================================================
-corrected_signal = spectrogram ./ y_fit;
 
-figure( 'Name', "Corrected Signal" );
-plot(wavelength, corrected_signal);
-xlabel('Wavelength (nm)');
-ylabel('Amplitude (a.u.)');
-title("Corrected Signal");
-legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5');
-
-%%% Weird asimptoptes centered around wavelength(1775)=435.48 nm ???
-%%% Caused by polynomial fit approaching 0. => Corrected by removing
-%%% detrend of the signal at the start of the code
-
-%% Detrend Now??
-% detrending the signal by substracting the means
-corrected_signal_detrended = bsxfun(@minus, corrected_signal, mean(corrected_signal, 2));
-
-figure( 'Name', "Corrected Signal Detrended" );
-plot(wavelength, corrected_signal_detrended);
-xlabel('Wavelength (nm)');
-ylabel('Amplitude (a.u.)');
-title("Corrected Signal Detrended");
-legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5');
