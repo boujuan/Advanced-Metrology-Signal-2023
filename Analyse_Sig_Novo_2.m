@@ -11,8 +11,6 @@ wavelength = ds_wl_range;
 %% Analyze the signal
 %==========================================================================
 num_curves = size(raw_spectra, 1);
-% detrending the signal by substracting the means
-% spectrogram = bsxfun(@minus, raw_spectra, mean(raw_spectra, 2));
 spectrogram = raw_spectra; % !!!!!!!!!!!! Left it without detrending due to weird asymptotes happening with correction later
 
 % define timestep (wavelength_resolution in this case) and sampling frequency
@@ -163,10 +161,11 @@ legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5');
 %% Detrend Now??
 % detrending the signal by substracting the means
 corrected_signal_detrended = bsxfun(@minus, corrected_signal, mean(corrected_signal, 2));
-
+% corrected_signal_detrended = bsxfun(@minus, corrected_signal, 1);
 figure( 'Name', "Corrected Signal Detrended" );
 plot(wavelength, corrected_signal_detrended);
 xlabel('Wavelength (nm)');
 ylabel('Amplitude (a.u.)');
 title("Corrected Signal Detrended");
 legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5');
+
