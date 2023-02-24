@@ -35,29 +35,29 @@ legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5');
 %==========================================================================
 % Initialize the peak locations and values arrays
 numSpectra = 4; % Only 4 spectra are being corrected because the 5th doesn't follow the curve
-maxPeaksPerSpectrum = 10;
+maxPeaksPerSpectrum = 10; % Pre-allocate space for performance (more than needed)
 peaks = zeros(numSpectra, maxPeaksPerSpectrum);
 peaksLoc = zeros(numSpectra, maxPeaksPerSpectrum);
 negPeaks = zeros(numSpectra, maxPeaksPerSpectrum);
 negPeaksLoc = zeros(numSpectra, maxPeaksPerSpectrum);
 
-%smooth the curve slightly for better peak finding
+%smooth the curve slightly for better peak finding -currently 3-points moving average-
 spectrum_smooth = smoothdata(spectrogram, 2, 'movmean', 3);
 
 hold on
 for i = 1:numSpectra
     % Find positive peaks in the spectrum
-    [peaksFound, peaksLocFound] = findpeaks(spectrum_smooth(i,:), 'MinPeakProminence', 0.5,'MinPeakHeight', 1.5,'Threshold', 0.01);
+    [peaksFound, loc_posPeaks] = findpeaks(spectrum_smooth(i,:), 'MinPeakProminence', 0.5,'MinPeakHeight', 1.5,'Threshold', 0.01);
     numPeaksFound = numel(peaksFound);
     peaks(i, 1:numPeaksFound) = peaksFound;
-    peaksLoc(i, 1:numPeaksFound) = peaksLocFound;
+    peaksLoc(i, 1:numPeaksFound) = loc_posPeaks;
     plot(wavelength(peaksLoc(i,1:numPeaksFound)), peaks(i,1:numPeaksFound), 'rv', 'MarkerFaceColor', 'r');
     
     % Find negative peaks in the spectrum
-    [negPeaksFound, negPeaksLocFound] = findpeaks(-spectrum_smooth(i,:), 'MinPeakProminence', 0.2, 'Threshold', 0.001);
+    [negPeaksFound, loc_negPeaks] = findpeaks(-spectrum_smooth(i,:), 'MinPeakProminence', 0.2, 'Threshold', 0.001);
     numNegPeaksFound = numel(negPeaksFound);
     negPeaks(i, 1:numNegPeaksFound) = -negPeaksFound;
-    negPeaksLoc(i, 1:numNegPeaksFound) = negPeaksLocFound;
+    negPeaksLoc(i, 1:numNegPeaksFound) = loc_negPeaks;
     plot(wavelength(negPeaksLoc(i,1:numNegPeaksFound)), negPeaks(i,1:numNegPeaksFound), 'g^', 'MarkerFaceColor', 'g');
 end
 hold off
@@ -133,7 +133,7 @@ title("Interpolated Calibration Curve");
 %==========================================================================
 x = wavelength;
 y = calibration_curve_interpolated(1,:);
-p = polyfit(x(~isnan(y)), y(~isnan(y)), 5); % fit a 4th-degree polynomial, ignoring NaN values
+p = polyfit(x(~isnan(y)), y(~isnan(y)), 4); % fit a 4th-degree polynomial, ignoring NaN values
 y_fit = polyval(p, x); % evaluate the polynomial at each wavelength
 
 figure( 'Name', "Polynomial Fit" );
@@ -154,10 +154,6 @@ ylabel('Amplitude (a.u.)');
 title("Corrected Signal");
 legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5');
 
-%%% Weird asimptoptes centered around wavelength(1775)=435.48 nm ???
-%%% Caused by polynomial fit approaching 0. => Corrected by removing
-%%% detrend of the signal at the start of the code
-
 %% Detrend Now??
 % detrending the signal by substracting the means
 corrected_signal_detrended = bsxfun(@minus, corrected_signal, mean(corrected_signal, 2));
@@ -168,4 +164,60 @@ xlabel('Wavelength (nm)');
 ylabel('Amplitude (a.u.)');
 title("Corrected Signal Detrended");
 legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5');
+
+%% Find a gaussian fit for the peaks
+%==========================================================================
+% THIS_WL = 400;
+% loc = [THIS_WL-400]./wavelength_resolution;
+
+% Defines the ranges where the gaussian peaks are pressent manually
+ranges = [424.62 425.44; 425.66 426.42; 426.8 427.54; 427.9 428.6; 439.88 440.56; 446.48 447.06; 523.06 523.38; 583.46 583.96];
+
+% Function to find the indices of these range values
+for i = 1:size(ranges, 1)
+    range_start = ranges(i, 1);
+    range_end = ranges(i, 2);
+    
+    indices = [];
+    for j = 1:length(wavelength)
+        if range_start <= wavelength(j) && wavelength(j) <= range_end
+            indices = [indices j];
+        end
+    end
+    
+    values = wavelength(indices);
+    first_index = indices(1);
+    last_index = indices(end);
+
+    disp("  wavelength(" + first_index + ":" + (last_index+1) + ")")
+end
+
+% Extract x and y values around the peak
+x_data = wavelength(1233:1274);
+y_data = corrected_signal_detrended(1233:1274);
+
+figure('Name',"Corrected Signal detrended 1 with gaussian fit for peak1");
+plot(wavelength, corrected_signal_detrended(1,:));
+
+% Define Gaussian function
+gaussian = fittype('a*exp(-((x-b)/c)^2)', 'independent', 'x', 'coefficients', {'a', 'b', 'c'});
+% gauss = @(coeff, x_data) coeff(1) * exp(-((x_data - coeff(2)) / coeff(3)).^2);
+
+% Initial guess for parameters
+% guess = [max_val, center, width];
+% lb = [0, center - width, 0];
+% ub = [2 * max_val, center + width, 2 * width];
+a0 = max(y_data);
+b0 = x_data(y_data==a0);
+c0 = 1;
+
+% Fit Gaussian function to data
+% [coeff, ~, ~, ~, ~, ~] = lsqcurvefit(gauss, guess, xdata, ydata, lb, ub);
+% fit_result = gauss(coeff, xdata);
+fit_result = fit(x_data.', y_data.', 'gauss2');
+
+% Plot original data and fitted Gaussian function
+hold on
+plot(fit_result)
+hold off
 
