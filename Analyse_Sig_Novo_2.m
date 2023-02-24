@@ -246,7 +246,7 @@ end
 % ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■%
 %% =================== FUNCTIONS ======================================= %%
 % ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■%
-%% GAUSSIAN FIT
+%% - GAUSSIAN FIT -
 %==========================================================================
 function [fitresult, gof] = gaussianFit(x_data, y_data)
 % gaussianFit(X_DATA,Y_DATA)
@@ -271,7 +271,7 @@ opts.StartPoint = [0.00160161352429178 425.45998727 0.118834175367943];
 % Fit model to the data using the previous parameters
 [fitresult, gof] = fit( xData, yData, ft, opts );
 end
-%% FIND WAVELENGTH INDICES
+%% - FIND WAVELENGTH INDICES -
 %==========================================================================
 function sl_indices = find_indices(wavelength_axis, ranges)
 % Fanction to find the indices of the spectral lines within specified ranges
