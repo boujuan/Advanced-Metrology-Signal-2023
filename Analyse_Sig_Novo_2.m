@@ -231,7 +231,8 @@ for i = 1:num_subplots
     y_data = corrected_signal_detrended(spectrum_index,sl_indices(sl_index, 1):sl_indices(sl_index, 2));
     
     % Fit the data with a gaussian function
-    [fitresult, gof] = gaussianFit(x_data, y_data);
+    startPoint = [0.00160161352429178 425.45998727 0.118834175367943];
+    [fitresult, gof] = gaussianFit(x_data, y_data, startPoint);
 
     % Plot fit with data.
     plot( fitresult, x_data, y_data );
@@ -248,7 +249,7 @@ end
 % ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■%
 %% - GAUSSIAN FIT -
 %==========================================================================
-function [fitresult, gof] = gaussianFit(x_data, y_data)
+function [fitresult, gof] = gaussianFit(x_data, y_data, startPoint)
 % gaussianFit(X_DATA,Y_DATA)
 %  Create a gaussain fit:
 %
@@ -259,14 +260,15 @@ function [fitresult, gof] = gaussianFit(x_data, y_data)
 %      fitresult : a fit object representing the fit.
 %      gof : structure with goodness-of fit info.
 
-[xData, yData] = prepareCurveData( x_data, y_data );
+[xData, yData] = prepareCurveData( x_data, y_data);
 
 % Set up fit type and parameters
 ft = fittype( 'gauss1' );
 opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
 opts.Display = 'Off';
 opts.Lower = [-Inf -Inf 0];
-opts.StartPoint = [0.00160161352429178 425.45998727 0.118834175367943];
+% opts.StartPoint = [0.00160161352429178 425.45998727 0.118834175367943];
+opts.StartPoint = startPoint;
 
 % Fit model to the data using the previous parameters
 [fitresult, gof] = fit( xData, yData, ft, opts );
