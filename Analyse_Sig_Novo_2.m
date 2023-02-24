@@ -114,7 +114,7 @@ for i = 1:num_curves
         % Find the indices of the non-NaN values
         non_nan_indices = find(~isnan(current_row));
         
-        % Interpolate the NaN values using a cubic spline
+        % Interpolate the NaN values using a linear interpolation
         current_row(nan_indices) = interp1(non_nan_indices, current_row(non_nan_indices), nan_indices, 'linear');
         
         % Replace the current row in calibration_curve with the interpolated values
