@@ -35,6 +35,12 @@ load("Data/Sig_para_Novo.mat", "ds_spectrum", "ds_wl_range");
 raw_spectra = ds_spectrum;
 wavelength = ds_wl_range;
 %==========================================================================
+%% Access NIST API and download the DATA
+%==========================================================================
+url = 'https://data.nist.gov/rmm/resourceApi';
+filename = 'Data/image.jpg';
+websave(filename,url);
+%==========================================================================
 %% Analyze the signal
 %==========================================================================
 num_curves = size(raw_spectra, 1);
@@ -166,9 +172,11 @@ title("Interpolated Calibration Curve");
 %% Find the polynomial fit of the calibration currve
 %==========================================================================
 x = wavelength;
-y = calibration_curve_interpolated(1,:);
+y = calibration_curve(1,:);
 % fit a 4th-degree polynomial, ignoring NaN values
-p = polyfit(x(~isnan(y)), y(~isnan(y)), 4);
+degree = 4;
+warning('off', 'MATLAB:polyfit:RepeatedPointsOrRescale');
+p = polyfit(x(~isnan(y)), y(~isnan(y)), degree);
 y_fit = polyval(p, x); % evaluate the polynomial at each wavelength
 
 figure( 'Name', "Polynomial Fit" );
@@ -205,7 +213,7 @@ legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5');
 %==========================================================================
 % Defines the ranges where the gaussian peaks of the spectral lines are
 % pressent in wavelength values (nm)
-ranges = [424.66 425.44; 425.66 426.42; 426.8 427.54; 427.9 428.6; 439.88 440.56; 446.48 447.06; 523.06 523.38; 583.46 583.96];
+ranges = [424.66 425.44; 425.66 426.42; 426.8 427.54; 427.9 428.6; 439.88 440.56; 446.48 447.06; 523.04 523.5; 583.46 583.96];
 % Find indices of these range values using the created function
 % find_indices. Returns a x by 2 array.
 sl_indices = find_indices(wavelength, ranges);
@@ -231,7 +239,9 @@ for i = 1:num_subplots
     y_data = corrected_signal_detrended(spectrum_index,sl_indices(sl_index, 1):sl_indices(sl_index, 2));
     
     % Fit the data with a gaussian function
-    startPoint = [0.00160161352429178 425.45998727 0.118834175367943];
+    % startPoint is the initial guess for the algorithm.
+    % startPoint = [0.00160161352429178 mean(x_data) 0.118834175367943];
+    startPoint = [std(y_data) mean(x_data) max(y_data)-min(y_data)];
     [fitresult, gof] = gaussianFit(x_data, y_data, startPoint);
 
     % Plot fit with data.
@@ -267,7 +277,6 @@ ft = fittype( 'gauss1' );
 opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
 opts.Display = 'Off';
 opts.Lower = [-Inf -Inf 0];
-% opts.StartPoint = [0.00160161352429178 425.45998727 0.118834175367943];
 opts.StartPoint = startPoint;
 
 % Fit model to the data using the previous parameters
@@ -288,12 +297,12 @@ function sl_indices = find_indices(wavelength_axis, ranges)
 
 sl_indices = zeros(size(ranges, 1), 2); % Preallocate the output matrix
 
-for i = 1:size(ranges, 1)
-    % Find indices within the range
-    sl_sub_indices = find((wavelength_axis >= ranges(i, 1)) & (wavelength_axis <= ranges(i, 2)));
-    
-    % Assign the starting and ending indices
-    sl_indices(i, :) = [sl_sub_indices(1), sl_sub_indices(end)];
-end
+    for i = 1:size(ranges, 1)
+        % Find indices within the range
+        sl_sub_indices = find((wavelength_axis >= ranges(i, 1)) & (wavelength_axis <= ranges(i, 2)));
+        
+        % Assign the starting and ending indices
+        sl_indices(i, :) = [sl_sub_indices(1), sl_sub_indices(end)];
+    end
 end
 %
