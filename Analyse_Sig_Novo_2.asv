@@ -1,5 +1,5 @@
 %%=========================================================================
-% ■■■■■■■■■ BEGINNING OF THE MATLAB SPECTRAL SIGNAL ANALYSIS TOOL ■■■■■■■■■
+% BEGINNING OF THE MATLAB SPECTRAL SIGNAL ANALYSIS TOOL
 % =========================================================================
 % For the exam of the class of 'Advanced Metrology' (5.04.4660)
 % Professor/Examiner: Prof. Dr. Philipp Huke
@@ -38,15 +38,12 @@ wavelength = ds_wl_range;
 %% Analyze the signal
 %==========================================================================
 num_curves = size(raw_spectra, 1);
-spectrogram = raw_spectra; % !Left it without detrending due to
+spectrogram = raw_spectra; % !!!!!!!!!!!! Left it without detrending due to
 %  weird asymptotes happening with correction later
 
-% define timestep (wavelength_resolution in this case) 
-% and sampling frequency
+% define timestep (wavelength_resolution in this case) and sampling frequency
 wavelength_resolution = wavelength(2) - wavelength(1);
 frequency = 1/wavelength_resolution;
-disp("Wavelength resolution:");
-disp(wavelength_resolution)
 
 % Display variance of each spectrum
 spectrum_var = var(spectrogram(1:5,:), 0, 2); 
@@ -65,16 +62,14 @@ legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5');
 %% Find the peaks in the spectrum and plot them
 %==========================================================================
 % Initialize the peak locations and values arrays
-% Only 4 spectra are being corrected because the 5th doesn't follow the curve
-numSpectra = 4; 
-maxPeaksPerSpectrum = 10; % Pre-allocate space for performance
+numSpectra = 4; % Only 4 spectra are being corrected because the 5th doesn't follow the curve
+maxPeaksPerSpectrum = 10; % Pre-allocate space for performance (more than needed)
 peaks = zeros(numSpectra, maxPeaksPerSpectrum);
 peaksLoc = zeros(numSpectra, maxPeaksPerSpectrum);
 negPeaks = zeros(numSpectra, maxPeaksPerSpectrum);
 negPeaksLoc = zeros(numSpectra, maxPeaksPerSpectrum);
 
-% Smooth the curve slightly for better 
-% peak finding -currently 3-points moving average-
+%smooth the curve slightly for better peak finding -currently 3-points moving average-
 spectrum_smooth = smoothdata(spectrogram, 2, 'movmean', 3);
 
 hold on
@@ -100,8 +95,7 @@ hold off
 % Initialize calibration_curve as a copy of spectrogram
 calibration_curve = spectrogram;
 
-% Define the region around the peaks to set to NaN 
-% (0.5 wavelength values left and right)
+% Define the region around the peaks to set to NaN (0.5 wavelength values left and right)
 region_size = round(0.5 / wavelength_resolution);
 
 for i = 1:numSpectra
@@ -167,8 +161,7 @@ title("Interpolated Calibration Curve");
 %==========================================================================
 x = wavelength;
 y = calibration_curve_interpolated(1,:);
-% fit a 4th-degree polynomial, ignoring NaN values
-p = polyfit(x(~isnan(y)), y(~isnan(y)), 4);
+p = polyfit(x(~isnan(y)), y(~isnan(y)), 4); % fit a 4th-degree polynomial, ignoring NaN values
 y_fit = polyval(p, x); % evaluate the polynomial at each wavelength
 
 figure( 'Name', "Polynomial Fit" );
@@ -189,11 +182,11 @@ ylabel('Amplitude (a.u.)');
 title("Corrected Signal");
 legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5');
 %==========================================================================
-%% Detrend The signal
+%% Detrend Now??
 %==========================================================================
 % detrending the signal by substracting the means
 corrected_signal_detrended = bsxfun(@minus, corrected_signal, mean(corrected_signal, 2));
-
+% corrected_signal_detrended = bsxfun(@minus, corrected_signal, 1);
 figure( 'Name', "Corrected Signal Detrended" );
 plot(wavelength, corrected_signal_detrended);
 xlabel('Wavelength (nm)');
@@ -206,53 +199,59 @@ legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5');
 % Defines the ranges where the gaussian peaks of the spectral lines are
 % pressent in wavelength values (nm)
 ranges = [424.66 425.44; 425.66 426.42; 426.8 427.54; 427.9 428.6; 439.88 440.56; 446.48 447.06; 523.06 523.38; 583.46 583.96];
-% Find indices of these range values using the created function
-% find_indices. Returns a x by 2 array.
-sl_indices = find_indices(wavelength, ranges);
 
-% Find the gaussian fit for each spectral line(sl_indices height) of each
-% spectrum (numSpectra=4, as we don't count the broken number 5 one)
-% Calculate the number of subplots needed
-num_subplots = size(sl_indices, 1) * numSpectra;
+% Function to find the indices of these range values of the spectral lines
+sl_indices = [];
+for i = 1:size(ranges, 1)
+    range_start = ranges(i, 1);
+    range_end = ranges(i, 2);
+    
+    sl_sub_indices = [];
+    for j = 1:length(wavelength)
+        if range_start <= wavelength(j) && wavelength(j) <= range_end
+            sl_sub_indices = [sl_sub_indices j];
+        end
+    end
+    
+    values = wavelength(sl_sub_indices);
+    first_index = sl_sub_indices(1);
+    last_index = sl_sub_indices(end);
 
-% Create the figure with subplots in each column
-figure('Name', "Gaussian Fit");
-set(gcf, 'Position', get(0, 'Screensize')); % Fullscreen plot
-for i = 1:num_subplots
-    % Calculate the spectrum and spectral line indices for this subplot
-    spectrum_index = mod(i-1, numSpectra) + 1;
-    sl_index = ceil(i/numSpectra);
-    
-    % Create the subplot
-    subplot(size(sl_indices,1), numSpectra, (sl_index-1)*numSpectra + spectrum_index);
-    
-    % Extract x and y values around the peak
-    x_data = wavelength(sl_indices(sl_index, 1):sl_indices(sl_index, 2));
-    y_data = corrected_signal_detrended(spectrum_index,sl_indices(sl_index, 1):sl_indices(sl_index, 2));
-    
-    % Fit the data with a gaussian function
-    [fitresult, gof] = gaussianFit(x_data, y_data);
+    sl_indices = [sl_indices; first_index, last_index];
+end
 
-    % Plot fit with data.
-    plot( fitresult, x_data, y_data );
-    legend('off');
+% Find the gaussian fit for each spectral line(sl_indices height) of each spectrum (numSpectra=4, as we don't count the broken number 5 one)
+figure( 'Name', "Gaussian Fit");
+for i = 1:numSpectra
+    % Create the subplots for each of the spectral lines
+    subplot(size(sl_indices,1), 1, i);
+    for j = 1:size(sl_indices, 1)
+        % Extract x and y values around the peak
+        x_data = wavelength(sl_indices(j, 1):sl_indices(j, 2));
+        y_data = corrected_signal_detrended(i,sl_indices(j, 1):sl_indices(j, 2));
     
-    % Label axes and title, grid
+        % Fit the data with a gaussian function
+        [fitresult, gof] = gaussianFit(x_data, y_data);
+
+        % Plot fit with data.
+        hold on;
+        plot( fitresult, x_data, y_data );
+        legend('off');
+    end
+    % Label axes
     xlabel( 'Wavelength', 'Interpreter', 'none' );
     ylabel( 'Signal', 'Interpreter', 'none' );
-    title(sprintf("Spectrum %d - Spectral Line %d", spectrum_index, sl_index));
+    title("Gaussian Fit for each spectral line of each spectrum");
     grid on
 end
 % ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■%
 %% =================== FUNCTIONS ======================================= %%
 % ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■%
-%% GAUSSIAN FIT
-%==========================================================================
 function [fitresult, gof] = gaussianFit(x_data, y_data)
 % gaussianFit(X_DATA,Y_DATA)
-%  Create a gaussain fit:
+%  Create a gaussain fit.
 %
-%  Input:
+%  Data for Gaussian Fit:
 %      X Input: x_data
 %      Y Output: y_data
 %  Output:
@@ -271,27 +270,4 @@ opts.StartPoint = [0.00160161352429178 425.45998727 0.118834175367943];
 % Fit model to the data using the previous parameters
 [fitresult, gof] = fit( xData, yData, ft, opts );
 end
-%% FIND WAVELENGTH INDICES
-%==========================================================================
-function sl_indices = find_indices(wavelength_axis, ranges)
-% Fanction to find the indices of the spectral lines within specified ranges
-%   
-%   Input:
-%       wavelength_axis: a vector of wavelength values
-%       ranges: a matrix of range values, with each row representing the start
-%       and end points of a range
-%   Output:
-%       sl_indices: a matrix of the starting and ending indices of the spectral
-%       lines within the specified ranges
-
-sl_indices = zeros(size(ranges, 1), 2); % Preallocate the output matrix
-
-for i = 1:size(ranges, 1)
-    % Find indices within the range
-    sl_sub_indices = find((wavelength_axis >= ranges(i, 1)) & (wavelength_axis <= ranges(i, 2)));
-    
-    % Assign the starting and ending indices
-    sl_indices(i, :) = [sl_sub_indices(1), sl_sub_indices(end)];
-end
-end
-%
+%%
