@@ -25,8 +25,8 @@ def initParser():
     parser.add_argument('filename', type=str) # Name of the file to save data to (e.g. 'data')
     parser.add_argument('--element', type=str, default="") # Element name (e.g. 'Fe', search any by default)
     parser.add_argument('--n', type=int, default=5) # Number of nearest lines to search for (default: 5)
-    parser.add_argument('--low_w', type=int, default=200) # Lower wavelength limit (default: 200)
-    parser.add_argument('--high_w', type=int, default=900) # Upper wavelength limit (default: 900)
+    parser.add_argument('--low_w', type=float, default=200) # Lower wavelength limit (default: 200)
+    parser.add_argument('--high_w', type=float, default=900) # Upper wavelength limit (default: 900)
     parser.add_argument('--ion_num', nargs='+', type=int, default=[1,2]) # List of ionization stages values to filter out (default: 1,2)
     parser.add_argument('--min_intensity', type=int, default=0) # Intensity minimum min_intensity (default: 0)
 

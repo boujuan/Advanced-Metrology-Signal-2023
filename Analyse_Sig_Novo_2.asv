@@ -304,8 +304,8 @@ arg9 = '--n';
 arg10 = num2str(NIST_samples); % number of spectral lines to be found in the NIST database
 
 % Execute the python script with the arguments defined above
-python_location = "C:\Users\Boujuan\anaconda3\"; % Change this to your python location (where python.exe is located)
-python_command_nist = strcat(python_location,"python.exe .\NIST_API\API_NIST_v3.py ", arg1, " ", arg2, " ", arg3, " ", arg4, " ", arg5, " ", arg6, " ", arg7, " ", arg8, " ", arg9, " ", arg10);
+python_command_nist = strcat("python.exe .\NIST_API\API_NIST_v3.py ", arg1, " ", arg2, " ", arg3, " ", arg4, " ", arg5, " ", arg6, " ", arg7, " ", arg8, " ", arg9, " ", arg10);
+system("conda activate base"); 
 system(python_command_nist);
 % python.exe .\NIST_API\API_NIST_v3.py 426 dataFe --low_w 425 --high_w 584 --min_intensity 5 --n 100
 
