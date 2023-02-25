@@ -222,6 +222,9 @@ sl_indices = find_indices(wavelength, ranges);
 % spectrum (numSpectra=4, as we don't count the broken number 5 one)
 % Calculate the number of subplots needed
 num_subplots = size(sl_indices, 1) * numSpectra;
+% Create array to store the maximum values of each spectrum for each spectral line
+max_value = zeros(numSpectra, size(sl_indices, 1));
+x_peak = zeros(numSpectra, size(sl_indices, 1));
 
 % Create the figure with subplots in each column
 figure('Name', "Gaussian Fit");
@@ -253,7 +256,31 @@ for i = 1:num_subplots
     ylabel( 'Signal', 'Interpreter', 'none' );
     title(sprintf("Spectrum %d - Spectral Line %d", spectrum_index, sl_index));
     grid on
+
+    % Find Maxima of each curve using the gaussian fit parameters
+    % fitresult.a1*exp(-((fitresult.b1-fitresult.b1)/fitresult.c1)^2);
+    max_value(spectrum_index,sl_index) = fitresult.a1*exp(0);
+    x_peak(spectrum_index,sl_index) = fitresult.b1;
+
 end
+%==========================================================================
+%% Find Spectral Lines Maxima
+%==========================================================================
+avg_max_value = zeros(1, size(max_value, 2));
+avg_x_peak = zeros(1, size(x_peak, 2));
+
+for i = 1:size(max_value, 2)
+    avg_max_value(i) = mean(max_value(:,i));
+end
+for i=1:size(x_peak, 2)
+    avg_x_peak(i) = mean(x_peak(:,i));
+end
+
+disp('Average Maxima of each spectral line:')
+disp(avg_max_value)
+disp('Located at wavelengths:')
+disp(avg_x_peak)
+
 % ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■%
 %% =================== FUNCTIONS ======================================= %%
 % ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■%
