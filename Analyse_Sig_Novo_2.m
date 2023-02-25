@@ -35,12 +35,6 @@ load("Data/Sig_para_Novo.mat", "ds_spectrum", "ds_wl_range");
 raw_spectra = ds_spectrum;
 wavelength = ds_wl_range;
 %==========================================================================
-%% Access NIST API and download the DATA
-%==========================================================================
-url = 'https://data.nist.gov/rmm/resourceApi';
-filename = 'Data/image.jpg';
-websave(filename,url);
-%==========================================================================
 %% Analyze the signal
 %==========================================================================
 num_curves = size(raw_spectra, 1);
