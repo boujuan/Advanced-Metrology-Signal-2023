@@ -227,7 +227,7 @@ max_value = zeros(numSpectra, size(sl_indices, 1));
 x_peak = zeros(numSpectra, size(sl_indices, 1));
 
 % Create the figure with subplots in each column
-figure('Name', "Gaussian Fit");
+figure('Name', "Gaussian Fits");
 set(gcf, 'Position', get(0, 'Screensize')); % Fullscreen plot
 for i = 1:num_subplots
     % Calculate the spectrum and spectral line indices for this subplot
@@ -261,7 +261,6 @@ for i = 1:num_subplots
     % fitresult.a1*exp(-((fitresult.b1-fitresult.b1)/fitresult.c1)^2);
     max_value(spectrum_index,sl_index) = fitresult.a1*exp(0);
     x_peak(spectrum_index,sl_index) = fitresult.b1;
-
 end
 %==========================================================================
 %% Find Spectral Lines Maxima
