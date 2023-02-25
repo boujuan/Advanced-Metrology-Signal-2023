@@ -8,7 +8,7 @@ import io
 
 # Example usage:
 #
-# python.exe .\API_NIST_v3.py Fe 393.4 10 data --low_w 400 --upper_w 600 --sp_num 1 2 --threshold 0.5
+# python.exe .\API_NIST_v3.py Fe 393.4 data --n 10 --low_w 400 --high_w 600 --ion_num 1 2 --min_intensity 0.5
 #
 # This will retrieve data for Iron (Fe element), filter out lines with wavelength outside the range of 300-600 nm,
 # filter out lines with ionization stages other than 1 or 2, filter out lines with intensity below 0.5,
@@ -18,25 +18,25 @@ import io
 # Parses arguments from command line
 def initParser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('element', type=str) # Element name (e.g. 'Ca')
-    parser.add_argument('line', type=float) # Line wavelength (e.g. 393.4)
-    parser.add_argument('n', type=int) # Number of nearest lines to search for (e.g. 10)
+    parser.add_argument('element', type=str) # Element name (e.g. 'Fe')
+    parser.add_argument('line', type=float) # Line wavelength (e.g. 393.4)    
     parser.add_argument('filename', type=str) # Name of the file to save data to (e.g. 'data')
+    parser.add_argument('--n', type=int, default=5) # Number of nearest lines to search for (default: 5)
     parser.add_argument('--low_w', type=int, default=200) # Lower wavelength limit (default: 200)
-    parser.add_argument('--upper_w', type=int, default=900) # Upper wavelength limit (default: 900)
-    parser.add_argument('--sp_num', nargs='+', type=int, default=[1,2]) # List of ionization stages values to filter out (default: 1,2)
-    parser.add_argument('--threshold', type=float, default=0) # Intensity minimum threshold (default: 0)
+    parser.add_argument('--high_w', type=int, default=900) # Upper wavelength limit (default: 900)
+    parser.add_argument('--ion_num', nargs='+', type=int, default=[1,2]) # List of ionization stages values to filter out (default: 1,2)
+    parser.add_argument('--min_intensity', type=float, default=0) # Intensity minimum min_intensity (default: 0)
 
     return parser
 
 # Retrieves data from NIST website as a pandas dataframe
-def retrieve_data(element, low_w, upper_w):
+def retrieve_data(element, low_w, high_w):
     site =  "https://physics.nist.gov/cgi-bin/ASD/lines1.pl?spectra={}" \
             "&limits_type=0&low_w={}" \
             "&upp_w={}" \
             "&unit=1&submit=Retrieve+Data&de=0&format=3&line_out=0&remove_js=on&en_unit=0&output=0&bibrefs=1&page_size=15&show_obs_wl=1&show_calc_wl=1&unc_out=1&order_out=0&max_low_enrg=&show_av=2&max_upp_enrg=&tsb_value=0&min_str=&A_out=1&intens_out=on&max_str=&allowed_out=1&forbid_out=1&min_accur=&min_intens=&conf_out=on&term_out=on&enrg_out=on&J_out=on"
 
-    site = site.format(element, low_w, upper_w)
+    site = site.format(element, low_w, high_w)
     respond = requests.get(site)
     soup = bs(respond.content, 'lxml')
     html_data = soup.get_text()
@@ -52,7 +52,7 @@ def clean_intensity(data_frame):
     data_frame['intens'] = pd.to_numeric(data_frame['intens'])
     return data_frame
 
-# Filters out lines with intensity lower than threshold
+# Filters out lines with intensity lower than min_intensity
 def line_threshold(data_frame, value=10 ** 2):
     data_frame = data_frame[data_frame['intens'] > value]
     return data_frame
@@ -62,9 +62,9 @@ def filter_nan_values(data_frame, column='obs_wl_air(nm)'):
     data_frame = data_frame[data_frame[column] > 0]
     return data_frame
 
-# Filters out lines with sp_num not in sp_num list (default: 1,2)
-def filter_sp(data_frame, sp_num):
-    data_frame = data_frame[data_frame['sp_num'].isin(sp_num)]
+# Filters out lines with ion_num not in ion_num list (default: 1,2)
+def filter_sp(data_frame, ion_num):
+    data_frame = data_frame[data_frame['ion_num'].isin(ion_num)]
     return data_frame
 
 # Searches for n nearest lines to given line and returns them as a dataframe sorted by intensity in descending order
@@ -79,10 +79,10 @@ def search_n_nearest_lines(data_frame, line, number_of_lines):
 if __name__ == '__main__':
     parser = initParser()
     args = parser.parse_args()
-    data_frame = retrieve_data(args.element, args.low_w, args.upper_w)
+    data_frame = retrieve_data(args.element, args.low_w, args.high_w)
     data_frame = clean_intensity(data_frame)
-    data_frame = line_threshold(data_frame, args.threshold)
+    data_frame = line_threshold(data_frame, args.min_intensity)
     data_frame = filter_nan_values(data_frame)
-    data_frame = filter_sp(data_frame, args.sp_num)
+    data_frame = filter_sp(data_frame, args.ion_num)
     lines_df = search_n_nearest_lines(data_frame, args.line, args.n)
     lines_df.to_csv(args.filename+'.csv')
