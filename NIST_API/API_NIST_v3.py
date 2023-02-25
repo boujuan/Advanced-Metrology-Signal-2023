@@ -14,7 +14,7 @@ def initParser():
     parser.add_argument('filename', type=str) # Name of the file to save data to (e.g. 'data')
     parser.add_argument('--low_w', type=int, default=200) # Lower wavelength limit (default: 200)
     parser.add_argument('--upper_w', type=int, default=900) # Upper wavelength limit (default: 900)
-    parser.add_argument('--sp_num', nargs='+', type=int, default=[1,2]) # List of sp_num values to filter out (default: 1,2)
+    parser.add_argument('--sp_num', nargs='+', type=int, default=[1,2]) # List of ionization stages values to filter out (default: 1,2)
     parser.add_argument('--threshold', type=float, default=0) # Intensity minimum threshold (default: 0)
 
     return parser
