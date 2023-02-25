@@ -5,11 +5,11 @@ import requests
 from bs4 import BeautifulSoup as bs
 import io
 import urllib.parse
-
 # Verify the certificate of the NIST website (https://physics.nist.gov) using the certificate file 'pml.nist.gov.crt' in the same directory as this script.
 # cert_path ="NIST_API/pml.nist.gov.crt"
 # response = requests.get("https://physics.nist.gov", verify=cert_path)
 
+########################################### BEGIN CODE ###################################################################
 # Example usage:
 #
 # python.exe .\API_NIST_v3.py 426.5 data --element Fe --n 10 --low_w 425 --high_w 584 --ion_num 1 2 --min_intensity 10
