@@ -5,7 +5,6 @@ import requests
 from bs4 import BeautifulSoup as bs
 import io
 
-
 # Example usage:
 #
 # python.exe .\API_NIST_v3.py Fe 393.4 data --n 10 --low_w 400 --high_w 600 --ion_num 1 2 --min_intensity 0.5
@@ -13,7 +12,6 @@ import io
 # This will retrieve data for Iron (Fe element), filter out lines with wavelength outside the range of 300-600 nm,
 # filter out lines with ionization stages other than 1 or 2, filter out lines with intensity below 0.5,
 # find the 10 nearest lines to a wavelength of 393.4 nm, and save the results to a file named 'data.csv'.
-
 
 # Parses arguments from command line
 def initParser():
