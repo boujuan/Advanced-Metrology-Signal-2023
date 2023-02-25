@@ -279,7 +279,7 @@ disp(avg_x_peak)
 %==========================================================================
 
 % Define the target wavelength and the NIST filename
-[~, idx] = max(abs(avg_max_value));; % Gets the index of the maximum peak of the signal
+[~, idx] = max(abs(avg_max_value)); % Gets the index of the maximum peak of the signal
 peakWL = avg_x_peak(idx); % Gets the wavelength of the maximum peak of the signal
 targetWL = fix(peakWL); % Convert to string 
 NIST_filename = strcat("NIST_dB_", num2str(targetWL), "_nm");
