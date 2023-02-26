@@ -274,15 +274,8 @@ end
 %==========================================================================
 %% Find Spectral Lines Maxima
 %==========================================================================
-avg_max_value = zeros(1, size(max_value, 2)-4);
-avg_x_peak = zeros(1, size(x_peak, 2)-4);
-
-for i = 1:size(max_value, 2)-4 % -4 to take only the 4 first peaks
-    avg_max_value(i) = mean(max_value(:,i));
-end
-for i=1:size(x_peak, 2)-4 % -4 to take only the 4 first peaks
-    avg_x_peak(i) = mean(x_peak(:,i));
-end
+avg_max_value = mean(max_value);
+avg_x_peak = mean(x_peak);
 
 disp('Average Maxima of each spectral line:')
 disp(avg_max_value)
@@ -292,9 +285,8 @@ disp(avg_x_peak)
 %==========================================================================
 %% Execute Python Script to Browse NIST Database and Find Spectral Lines
 %==========================================================================
-
 % Define the target wavelength and the NIST filename
-[~, idx] = max(abs(avg_max_value)); % Gets the index of the maximum peak of the signal
+[~, idx] = max(abs(avg_max_value(1:4))); % Gets the index of the maximum peak of the signal
 peakWL = avg_x_peak(idx); % Gets the wavelength of the maximum peak of the signal
 targetWL = fix(peakWL); % Rounds the wavelength to the nearest integer
 NIST_filename = sprintf('NIST_dB_%d_nm', targetWL);
