@@ -289,6 +289,7 @@ disp(avg_x_peak)
 %% Execute Python Script to Browse NIST Database and Find Spectral Lines
 %==========================================================================
 % Execute the python script to browse the NIST database and find the spectral lines
+% Data is saved into a csv file in \Data as "NIST_dB_{wavelength of line}_nm.csv"
 min_intensity = '10';
 NIST_samples = '100';
 for i=1:size(avg_max_value,1)-4 % For each spectrum (only count the first 4)
