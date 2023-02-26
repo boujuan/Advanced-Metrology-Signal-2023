@@ -131,4 +131,4 @@ if __name__ == '__main__':
     data_frame = filter_nan_values(data_frame)
     data_frame = filter_ion(data_frame, args.ion_num)
     lines_df = search_n_nearest_lines(data_frame, args.line, args.n)
-    lines_df.to_csv('Data/'+args.filename+'.csv')
+    lines_df.to_csv('Data/'+args.filename+'.csv') # Saves data to a csv file in Data folder
