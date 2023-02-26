@@ -285,31 +285,13 @@ disp(avg_x_peak)
 %==========================================================================
 %% Execute Python Script to Browse NIST Database and Find Spectral Lines
 %==========================================================================
-% Define the target wavelength and the NIST filename
-[~, idx] = max(abs(avg_max_value(1:4))); % Gets the index of the maximum peak of the signal
-peakWL = avg_x_peak(idx); % Gets the wavelength of the maximum peak of the signal
-targetWL = fix(peakWL); % Rounds the wavelength to the nearest integer
-NIST_filename = sprintf('NIST_dB_%d_nm', targetWL);
+% Execute the python script to browse the NIST database and find the spectral lines
 min_intensity = '10';
 NIST_samples = '100';
-
-arg1 = peakWL; % Target wavelength to search for in the NIST database
-arg2 = NIST_filename; % filename to save the data to (without extension)
-arg3 = '--low_w';
-arg4 = min(avg_x_peak); % low wavelength range to search for spectral lines
-arg5 = '--high_w';
-arg6 = max(avg_x_peak); % high wavelength range to search for spectral lines
-arg7 = '--min_intensity';
-arg8 = min_intensity; % minimum relative intensity of the spectral lines to be found
-arg9 = '--n';
-arg10 = NIST_samples; % number of spectral lines to be found in the NIST database
-
-% Execute the python script with the arguments defined above
-python_command_nist = sprintf('%spython.exe .\\NIST_API\\API_NIST_v3.py %d %s %s %d %s %d %s %s %s %s', ...
-    python_location, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-system(python_command_nist);
-% Example: 
-% python.exe .\NIST_API\API_NIST_v3.py 426 dataFe --element Fe --low_w 425.5 --high_w 584.5 --min_intensity 20 --ion_num 1 --n 3
+for i=1:size(avg_max_value,1)-4 % For each spectrum (only count the first 4)
+    [~, wl_idx] = max(abs(avg_max_value(i))); % Gets the index of the maximum peak of the signal
+    browseNIST(avg_x_peak(wl_idx), min_intensity, NIST_samples); % Browse the NIST database for the spectral line and saves it into a csv
+end
 
 % ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■%
 %% =================== FUNCTIONS ======================================= %%
@@ -362,5 +344,39 @@ sl_indices = zeros(size(ranges, 1), 2); % Preallocate the output matrix
         % Assign the starting and ending indices
         sl_indices(i, :) = [sl_sub_indices(1), sl_sub_indices(end)];
     end
+end
+%==========================================================================
+%% - BROWSE NIST DATABASE -
+%==========================================================================
+function browseNIST(peakWL, min_intensity, NIST_samples)
+% Function to browse the NIST database and find the spectral lines
+%
+%   Input:
+%      peakWL: the wavelength of the peak to search for in the NIST database
+%      min_intensity: the minimum relative intensity of the spectral lines to be found
+%      NIST_samples: the number of spectral lines to be found in the NIST database
+%   Output:
+%      Creates a csv file in /Data with the spectral lines found in the NIST database
+%      For the given wavelengths and minimum intensity, samples
+
+    NIST_filename = sprintf('NIST_dB_%d_nm', fix(peakWL));
+    
+    arg1 = peakWL; % Target wavelength to search for in the NIST database
+    arg2 = NIST_filename; % filename to save the data to (without extension)
+    arg3 = '--low_w';
+    arg4 = min(avg_x_peak); % low wavelength range to search for spectral lines
+    arg5 = '--high_w';
+    arg6 = max(avg_x_peak); % high wavelength range to search for spectral lines
+    arg7 = '--min_intensity';
+    arg8 = min_intensity; % minimum relative intensity of the spectral lines to be found
+    arg9 = '--n';
+    arg10 = NIST_samples; % number of spectral lines to be found in the NIST database
+
+    % Execute the python script with the arguments defined above
+    % Example: 
+    % python.exe .\NIST_API\API_NIST_v3.py 426 dataFe --element Fe --low_w 425.5 --high_w 584.5 --min_intensity 20 --ion_num 1 --n 3
+    python_command_nist = sprintf('%spython.exe .\\NIST_API\\API_NIST_v3.py %d %s %s %d %s %d %s %s %s %s', ...
+        python_location, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+    system(python_command_nist);    
 end
 %
