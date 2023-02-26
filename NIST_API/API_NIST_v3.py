@@ -30,7 +30,7 @@ import urllib.parse
 # in the winter semester of 2022/2023. For analysing Spectrographic Data of Atomic Emission Spectroscopy.
 # This also goes together with a Report with further explanations and results.
 #
-# REFERENCES:   Parts of the code were inspired from the following sources:
+# REFERENCES:
 #               https://physics.nist.gov/cgi-bin/ASD/lines1.pl
 #               https://github.com/SirJohnFranklin/nist-asd
 #               https://github.com/MKastek/NIST-database-webscraping

@@ -21,6 +21,8 @@
 % spurious ones and they are also fitted to a gaussian curve.
 % This allow us to characterise them and compare them with common 
 % wavelength values found in spectrography database such as the NIST one.
+% For that, the code also includes a python script that fetches the data
+% (API_NIST_v3.py) and stores it in a .csv file.
 %
 % All this information is encapsulated in the attached report pdf.
 % =========================================================================
