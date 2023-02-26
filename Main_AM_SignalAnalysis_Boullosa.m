@@ -24,16 +24,22 @@
 %
 % All this information is encapsulated in the attached report pdf.
 % =========================================================================
-%% Init Clearance
+%% Init Clearance and set python location
+%==========================================================================
 clear 
 close all
 clc
+% Change this to your python location (where python.exe is located)
+% This is just used for a Fetching script that I made to get the NIST data
+python_location = "%userprofile%\anaconda3\";
+
 %==========================================================================
 %% Load data
 %==========================================================================
 load("Data/Sig_para_Novo.mat", "ds_spectrum", "ds_wl_range");
 raw_spectra = ds_spectrum;
 wavelength = ds_wl_range;
+
 %==========================================================================
 %% Analyze the signal
 %==========================================================================
@@ -52,6 +58,7 @@ disp(wavelength_resolution)
 spectrum_var = var(spectrogram(1:5,:), 0, 2); 
 disp("Variance of each spectrum:");
 disp(spectrum_var)
+
 %==========================================================================
 %% Plotting the signal
 %==========================================================================
@@ -61,6 +68,7 @@ xlabel('Wavelegth (nm)');
 ylabel('Amplitude (a. u.)');
 title("Signal");
 legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5');
+
 %==========================================================================
 %% Find the peaks in the spectrum and plot them
 %==========================================================================
@@ -94,6 +102,7 @@ for i = 1:numSpectra
     plot(wavelength(negPeaksLoc(i,1:numNegPeaksFound)), negPeaks(i,1:numNegPeaksFound), 'g^', 'MarkerFaceColor', 'g');
 end
 hold off
+
 %==========================================================================
 %% Create the calibration curve
 %==========================================================================
@@ -131,6 +140,7 @@ end
 figure( 'Name', "Calibration Curve" );
 plot(wavelength,calibration_curve);
 title("Calibration Curve");
+
 %==========================================================================
 %% Interpolate the missing values in Calibration Curve
 %==========================================================================
@@ -162,6 +172,7 @@ plot(wavelength, calibration_curve_interpolated);
 xlabel('Wavelength (nm)');
 ylabel('Amplitude (a.u.)');
 title("Interpolated Calibration Curve");
+
 %==========================================================================
 %% Find the polynomial fit of the calibration currve
 %==========================================================================
@@ -179,6 +190,7 @@ hold on
 plot(x, y_fit, 'LineWidth',2, 'Color', 'r', 'LineStyle', '--');
 title("Polynomial Fit");
 legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5', 'Polynomial Fit');
+
 %==========================================================================
 %% Divide the signal by the polynomial fit to get the corrected signal
 %==========================================================================
@@ -190,6 +202,7 @@ xlabel('Wavelength (nm)');
 ylabel('Amplitude (a.u.)');
 title("Corrected Signal");
 legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5');
+
 %==========================================================================
 %% Detrend The signal
 %==========================================================================
@@ -202,6 +215,7 @@ xlabel('Wavelength (nm)');
 ylabel('Amplitude (a.u.)');
 title("Corrected Signal Detrended");
 legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5');
+
 %==========================================================================
 %% Find a gaussian fit for the peaks
 %==========================================================================
@@ -256,6 +270,7 @@ for i = 1:num_subplots
     max_value(spectrum_index,sl_index) = fitresult.a1*exp(0);
     x_peak(spectrum_index,sl_index) = fitresult.b1;
 end
+
 %==========================================================================
 %% Find Spectral Lines Maxima
 %==========================================================================
@@ -298,10 +313,10 @@ arg9 = '--n';
 arg10 = num2str(NIST_samples); % number of spectral lines to be found in the NIST database
 
 % Execute the python script with the arguments defined above
-python_location = "%userprofile%\anaconda3\"; % Change this to your python location (where python.exe is located)
 python_command_nist = strcat(python_location,"python.exe .\NIST_API\API_NIST_v3.py ", arg1, " ", arg2, " ", arg3, " ", arg4, " ", arg5, " ", arg6, " ", arg7, " ", arg8, " ", arg9, " ", arg10);
 system(python_command_nist);
-% python.exe .\NIST_API\API_NIST_v3.py 426 dataFe --low_w 425 --high_w 584 --min_intensity 5 --n 100
+% Example: 
+% python.exe .\NIST_API\API_NIST_v3.py 426 dataFe --element Fe --low_w 425.5 --high_w 584.5 --min_intensity 20 --ion_num 1 --n 3
 
 % ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■%
 %% =================== FUNCTIONS ======================================= %%
@@ -331,6 +346,7 @@ opts.StartPoint = startPoint;
 % Fit model to the data using the previous parameters
 [fitresult, gof] = fit( xData, yData, ft, opts );
 end
+%==========================================================================
 %% - FIND WAVELENGTH INDICES -
 %==========================================================================
 function sl_indices = find_indices(wavelength_axis, ranges)
