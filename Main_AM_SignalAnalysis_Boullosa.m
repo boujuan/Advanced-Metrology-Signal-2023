@@ -354,7 +354,7 @@ disp("========================================");
 %==========================================================================
 % Load NIST data from csv files
 disp('Loading NIST data...');
-numCols = 2; % Number of columns to prealocate
+numCols = 3; % Number of columns to prealocate
 
 % Preallocate NIST_data cell (rows: NIST_samples, columns: 2, depth: numImpPeaks=4)
 NIST_data = cell(NIST_samples, numCols, numImpPeaks);
@@ -367,8 +367,8 @@ for i = 1:numImpPeaks % For each spectrum (only count the first 4)
     % Read in the CSV file as a cell array
     data = readcell(file_path, 'Delimiter', ',', 'NumHeaderLines', 1);
     
-    % Extract the 2nd and 4th columns of the CSV file
-    data_cols = data(:, [2, 4]);
+    % Extract the 2nd, 4th and 8th columns of the CSV file
+    data_cols = data(:, [2, 4, 8]);
 
     % Ensure that data_cols has the same number of rows as NIST_data
     data_cols = data_cols(1:NIST_samples, :);
@@ -376,7 +376,7 @@ for i = 1:numImpPeaks % For each spectrum (only count the first 4)
     % Store the data in the cell array 
     NIST_data(:, :, i) = data_cols;
     % Rows: Samples (1-100), 
-    % Column 1: Element name, Column 2: Wavelength, 
+    % Column 1: Element name, Column 2: Wavelength, Column 3: Intensity 
     % 3rd Dimension (1-4): Spectral Line
 end
 
