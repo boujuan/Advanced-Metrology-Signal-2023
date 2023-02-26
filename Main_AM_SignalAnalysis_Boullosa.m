@@ -349,6 +349,39 @@ else
 end
 disp("========================================");
 
+%==========================================================================
+%% Identify Spectral Lines by Comparing NIST Data with Spectral Lines
+%==========================================================================
+% Load NIST data from csv files
+disp('Loading NIST data...');
+numCols = 2; % Number of columns in the csv file
+
+% Preallocate NIST_data cell (rows: NIST_samples, columns: 8, depth: numImpPeaks=4)
+NIST_data = cell(NIST_samples, numCols, numImpPeaks);
+
+% Read the csv files and store the data in NIST_data cell
+for i = 1:numImpPeaks % For each spectrum (only count the first 4)
+    file_name = ['NIST_dB_' num2str(fix(avg_x_peak(i)*1000)) '_pm.csv'];
+    file_path = [pwd '\Data\' file_name];
+
+    % Read in the CSV file as a cell array
+    data = readcell(file_path, 'Delimiter', ',', 'NumHeaderLines', 1);
+    
+    % Extract the 2nd and 4th columns of the CSV file
+    data_cols = data(:, [2, 4]);
+
+    % Ensure that data_cols has the same number of rows as NIST_data
+    data_cols = data_cols(1:NIST_samples, :);
+    
+    % Store the data in the cell array 
+    NIST_data(:, :, i) = data_cols;
+    % Rows: Samples (1-100), 
+    % Column 1: Element name, Column 2: Wavelength, 
+    % 3rd Dimension (1-4): Spectral Line
+end
+
+wavelengthValue = double(NIST_data{1, 2, 1}); % Convert cell to double example
+
 % ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■%
 %% =================== FUNCTIONS ======================================= %%
 % ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■%
