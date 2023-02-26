@@ -259,8 +259,8 @@ end
 %==========================================================================
 %% Find Spectral Lines Maxima
 %==========================================================================
-avg_max_value = zeros(1, size(max_value, 2));
-avg_x_peak = zeros(1, size(x_peak, 2));
+avg_max_value = zeros(1, size(max_value, 2)-4);
+avg_x_peak = zeros(1, size(x_peak, 2)-4);
 
 for i = 1:size(max_value, 2)-4 % -4 to take only the 4 first peaks
     avg_max_value(i) = mean(max_value(:,i));

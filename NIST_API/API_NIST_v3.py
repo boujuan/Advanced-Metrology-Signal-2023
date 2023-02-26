@@ -5,9 +5,11 @@ import requests
 from bs4 import BeautifulSoup as bs
 import io
 import urllib.parse
-# Verify the certificate of the NIST website (https://physics.nist.gov) using the certificate file 'pml.nist.gov.crt' in the same directory as this script.
-# cert_path ="NIST_API/pml.nist.gov.crt"
-# response = requests.get("https://physics.nist.gov", verify=cert_path)
+
+# IMPORTANT NOTE: 
+# You might need to install pip_system_certs 
+# (pip install pip_system_certs) to fix SSL certificate error on Windows 10/11. 
+# Not sure about other OS.
 
 ########################################### BEGIN CODE ###################################################################
 # Example usage:
