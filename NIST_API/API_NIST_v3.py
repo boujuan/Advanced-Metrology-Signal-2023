@@ -153,6 +153,7 @@ if __name__ == '__main__':
     
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     # Uncomment upper lines and comment lower lines to use arguments from command line
+    # (Command Line mode currently the ONLY working one)
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     # @ Takes arguments from matlab "pyrunfile" function:
     # low_w2 = float(low_w)
