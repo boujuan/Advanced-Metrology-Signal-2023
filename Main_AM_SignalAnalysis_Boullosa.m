@@ -9,17 +9,23 @@
 % Student Name: Juan Manuel Boullosa Novo
 % Student ID: 2481927
 %
-% Description:
+% Description & Disclaimer:
 %
 % The following code was made individually with the purpose to load and 
 % analyse the data provided belonging to a spectral information from an
-% alledged "Prism-spectrograph" tool. This code begins by doing a basic
-% signal analysis of the properties of the data, including the plotting,
-% to then finding the interesting peaks in the spectrum, taking them
-% apart to focus on the continuum line, which is fitted to a polynomial
-% curve in order to flatten it. Then it is detrended, and the peaks
-% belonging to the interesting spectral lines are located against the
-% spurious ones and they are also fitted to a gaussian curve.
+% alledged "Prism-spectrograph" tool.
+% This means that although there was collaboration with the other students
+% in the class, the code was made individually and the results are my own.
+% I take responsibility and understand that any plagiarism will be
+% considered as a serious offense.
+%
+% This code begins by doing a basicsignal analysis of the properties of
+% the data, including the plotting, to then finding the interesting peaks
+% in the spectrum, taking them apart to focus on the continuum line,
+% which is fitted to a polynomial curve in order to flatten it.
+% Then it is detrended, and the peaks belonging to the interesting spectral
+% lines are located against the spurious ones and they are also fitted
+% to a gaussian curve.
 % This allow us to characterise them and compare them with common 
 % wavelength values found in spectrography database such as the NIST one.
 % For that, the code also includes a python script that fetches the data
@@ -41,10 +47,16 @@ pyenv('Version', [python_location, 'python.exe']);
 %==========================================================================
 %% Load data
 %==========================================================================
+% Load the data from the .mat file (provided by the professor)
 load("Data/Sig_para_Novo.mat", "ds_spectrum", "ds_wl_range");
-raw_spectra = ds_spectrum;
-wavelength = ds_wl_range;
+raw_spectra = ds_spectrum; % Raw data (y-axis)
+wavelength = ds_wl_range; % Wavelength range (x-axis)
 
+% Checks if there are already NIST data files in the Data folder
+file_list_NIST= dir('Data/NIST_dB_*_nm.csv');
+
+disp('Data loaded successfully.');
+disp("========================================")
 %==========================================================================
 %% Analyze the signal
 %==========================================================================
@@ -240,8 +252,21 @@ max_value = zeros(numSpectra, size(sl_indices, 1));
 x_peak = zeros(numSpectra, size(sl_indices, 1));
 
 % Create the figure with subplots in each column
-figure('Name', "Gaussian Fits");
-set(gcf, 'Position', get(0, 'Screensize')); % Fullscreen plot
+disp("========================================")
+disp("Finding Gaussian Fits... Please wait...");
+
+% Get the screen size
+screen_size = get(groot, 'ScreenSize');
+
+% Calculate the desired size for the figure window
+width = screen_size(3) * 0.75; % 80% of screen width
+height = screen_size(4) * 0.75; % 80% of screen height
+
+% Calculate the position for the figure window to be centered
+left = (screen_size(3) - width) / 2;
+bottom = (screen_size(4) - height) / 2;
+
+figure('Name', "Gaussian Fits", 'Position', [left, bottom, width, height]);
 for i = 1:num_subplots
     % Calculate the spectrum and spectral line indices for this subplot
     spectrum_index = mod(i-1, numSpectra) + 1;
@@ -282,6 +307,8 @@ end
 avg_max_value = mean(max_value);
 avg_x_peak = mean(x_peak);
 
+disp("...Done!");
+disp("========================================");
 disp('Average Maxima of each spectral line:')
 disp(avg_max_value)
 disp('Located at wavelengths:')
@@ -299,12 +326,27 @@ element = ''; % Element to be searched in the NIST database (leave empty to sear
 ion_num = 1; % Ion number of the element to be searched in the NIST database (leave empty to search for all ion numbers)
 [~, wl_idx] = max(abs(avg_max_value)); % Gets the index of the maximum peak of the whole signal
 
+disp("========================================");
 numImpPeaks = size(avg_max_value,2)-4; % Only care about first 4 peaks
-for i=1:numImpPeaks % For each spectrum (only count the first 4)    
-    browseNIST(i,avg_x_peak(i), min_intensity, NIST_samples, python_location, element, ion_num); % Browse the NIST database for the spectral line and saves it into a csv    
+if length(file_list_NIST) >= numImpPeaks
+    user_input = input(['NIST data already found for all ' num2str(numImpPeaks) ' peaks. Do you want to regenerate the data? (y/n): '], 's');
+    if strcmpi(user_input, 'y')
+        for i=1:numImpPeaks % For each spectrum (only count the first 4)    
+            browseNIST(i,avg_x_peak(i), min_intensity, NIST_samples, python_location, element, ion_num); % Browse the NIST database for the spectral line and saves it into a csv    
+        end
+        disp('...');
+        disp('Success! All data regenerated in Data/NIST_dB_{wavelength}_nm.csv');
+    else
+        disp('>> Skipping NIST data generation...');
+    end
+else
+    for i=1:numImpPeaks % For each spectrum (only count the first 4)    
+        browseNIST(i,avg_x_peak(i), min_intensity, NIST_samples, python_location, element, ion_num); % Browse the NIST database for the spectral line and saves it into a csv    
+    end
+    disp('...');
+    disp('Success! All data collected in Data/NIST_dB_{wavelength}_nm.csv');
 end
-disp('...');
-disp('Success! All data collected in Data/NIST_dB_{wavelength}_nm.csv');
+disp("========================================");
 
 % ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■%
 %% =================== FUNCTIONS ======================================= %%
