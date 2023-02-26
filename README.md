@@ -6,7 +6,7 @@ After analyzing the data, the program generates several plots that display the c
 To identify which elements correspond to some of the lines in the data, the program uses the python script to query the NIST Atomic Spectra Database and retrieve relevant atomic spectra. It then compares the positions of the lines in the data with the positions of the lines in the atomic spectra and identifies the closest match. The program outputs a table that lists the identified elements and their corresponding lines in the data.
 To install and use this project, you need to have Matlab and Python installed on your computer. Follow these steps:
 
-1. Clone this repository to your local machine.
+1. Clone this repository to your local machine or download latest release.
 
 2. Open Matlab and navigate to the folder where you cloned this repository.
 
