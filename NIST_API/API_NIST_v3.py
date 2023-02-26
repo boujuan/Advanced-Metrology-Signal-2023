@@ -21,6 +21,21 @@ import urllib.parse
 # filter out lines with ionization stages other than 1 or 2, filter out lines with intensity below 10,
 # find the 10 nearest lines to a wavelength of 426.5 nm, and save the results to a file named 'data.csv'.
 #
+# THIS SCRIPT WAS CREATED BY: Juan Manuel Boullosa Novo, Studentnummer: 2481927
+#
+# DATE: 2023-02-26
+#
+# PURPOSE: To retrieve data from NIST website and save it to a csv file to be used in conjunction with the main
+# Matlab Script "Main_AM_SignalAnalysis_Boullosa.m" for the project of Advanced Metrology in the University of Oldenburg
+# in the winter semester of 2022/2023. For analysing Spectrographic Data of Atomic Emission Spectroscopy.
+# This also goes together with a Report with further explanations and results.
+#
+# REFERENCES:   Parts of the code were inspired from the following sources:
+#               https://physics.nist.gov/cgi-bin/ASD/lines1.pl
+#               https://github.com/SirJohnFranklin/nist-asd
+#               https://github.com/MKastek/NIST-database-webscraping
+#               https://github.com/astro-data/nist_atomic_lines_package
+#
 ##########################################################################################################################
 
 # Parses arguments from command line
