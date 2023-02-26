@@ -87,7 +87,7 @@ def retrieve_data(element, low_w, high_w, min_intensity):
     html_data = soup.get_text()
     html_data = html_data.replace('"', "")
     data = io.StringIO(html_data)
-    drop_columns=['gA(s^-1)','Ei(cm-1)','conf_i','term_i','J_i','conf_k','term_k','J_k','Type','tp_ref','line_ref','Ek(cm-1)','Unnamed: 20']
+    drop_columns=['gA(s^-1)','Ei(cm-1)','conf_i','term_i','J_i','conf_k','term_k','J_k','Type','tp_ref','line_ref','Ek(cm-1)','Acc','Unnamed: 20']
     data_frame = pd.read_csv(data, sep="\t").drop(drop_columns, axis=1)
     return data_frame
 
