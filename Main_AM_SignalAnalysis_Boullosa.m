@@ -10,6 +10,7 @@
 % Student ID: 2481927
 %
 % Description:
+%
 % The following code was made individually with the purpose to load and 
 % analyse the data provided belonging to a spectral information from an
 % alledged "Prism-spectrograph" tool. This code begins by doing a basic
