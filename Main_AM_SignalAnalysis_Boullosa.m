@@ -359,6 +359,9 @@ end
 function browseNIST(wl_idx, avg_x_peak, min_intensity, NIST_samples, python_location)
 % Function to browse the NIST database and find the spectral lines
 %
+% Please run this function as it is, in command-line mode, as the pyrunfile mode
+% Is currently not working
+%
 %   Input:
 %      peakWL: the wavelength of the peak to search for in the NIST database
 %      avg_x_peak: the average wavelength of the spectral lines to be found
