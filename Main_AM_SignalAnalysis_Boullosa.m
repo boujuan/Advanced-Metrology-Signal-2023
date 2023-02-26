@@ -292,14 +292,19 @@ disp(avg_x_peak)
 %==========================================================================
 % Execute the python script to browse the NIST database and find the spectral lines
 % Data is saved into a csv file in \Data as "NIST_dB_{wavelength of line}_nm.csv"
-min_intensity = '10';
-NIST_samples = '100';
-[~, wl_idx] = max(abs(avg_max_value)); % Gets the index of the maximum peak of the signal
 
-for i=1:size(avg_max_value,2)-4 % For each spectrum (only count the first 4)    
-    browseNIST(wl_idx, avg_x_peak, min_intensity, NIST_samples, python_location); % Browse the NIST database for the spectral line and saves it into a csv
-    wait(status);
+min_intensity = 10; % Minimum intensity of the spectral line to be considered
+NIST_samples = 100; % Number of samples to be taken from the NIST database into the csv file 
+element = ''; % Element to be searched in the NIST database (leave empty to search for all elements)
+ion_num = 1; % Ion number of the element to be searched in the NIST database (leave empty to search for all ion numbers)
+[~, wl_idx] = max(abs(avg_max_value)); % Gets the index of the maximum peak of the whole signal
+
+numImpPeaks = size(avg_max_value,2)-4; % Only care about first 4 peaks
+for i=1:numImpPeaks % For each spectrum (only count the first 4)    
+    browseNIST(i,avg_x_peak(i), min_intensity, NIST_samples, python_location, element, ion_num); % Browse the NIST database for the spectral line and saves it into a csv    
 end
+disp('...');
+disp('Success! All data collected in Data/NIST_dB_{wavelength}_nm.csv');
 
 % ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■%
 %% =================== FUNCTIONS ======================================= %%
@@ -356,57 +361,72 @@ end
 %==========================================================================
 %% - BROWSE NIST DATABASE -
 %==========================================================================
-function browseNIST(wl_idx, avg_x_peak, min_intensity, NIST_samples, python_location)
+function browseNIST(i,avg_x_peak, min_intensity, NIST_samples, python_location, element, ion_num)
 % Function to browse the NIST database and find the spectral lines
 %
 % Please run this function as it is, in command-line mode, as the pyrunfile mode
 % Is currently not working
 %
 %   Input:
-%      peakWL: the wavelength of the peak to search for in the NIST database
+%      i: the index of the spectrum to be searched for in the NIST database
 %      avg_x_peak: the average wavelength of the spectral lines to be found
 %      min_intensity: the minimum relative intensity of the spectral lines to be found
 %      NIST_samples: the number of spectral lines to be found in the NIST database
+%      python_location: the location of the python.exe file (defined at the beginning of the script)
+%      element: the element to be searched in the NIST database (leave empty to search for all elements)
+%      ion_num: the ion number of the element to be searched in the NIST database (leave empty to search for all ion numbers)
+%
 %   Output:
 %      Creates a csv file in /Data with the spectral lines found in the NIST database
 %      For the given wavelengths and minimum intensity, samples
     
-    peakWL = avg_x_peak(wl_idx);
-    NIST_filename = sprintf('NIST_dB_%d_nm', fix(peakWL));    
+    NIST_filename = sprintf('NIST_dB_%d_nm', fix(avg_x_peak)); % originally using peakWL
     
-    arg1 = peakWL; % Target wavelength to search for in the NIST database
+    arg1 = avg_x_peak; % Target wavelength to search for in the NIST database, originally using peakWL
     arg2 = NIST_filename; % filename to save the data to (without extension)
-    arg3 = '--low_w';
-    arg4 = min(avg_x_peak); % low wavelength range to search for spectral lines
-    arg5 = '--high_w';
-    arg6 = max(avg_x_peak); % high wavelength range to search for spectral lines
-    arg7 = '--min_intensity';
-    arg8 = min_intensity; % minimum relative intensity of the spectral lines to be found
-    arg9 = '--n';
-    arg10 = NIST_samples; % number of spectral lines to be found in the NIST database
-    arg11 = 1;
+    arg3 = '--element';
+    arg4 = element;
+    arg5 = '--low_w';
+    arg6 = avg_x_peak-10; % low wavelength range to search for spectral lines, originally using min()
+    arg7 = '--high_w';
+    arg8 = avg_x_peak+10; % high wavelength range to search for spectral lines, originally using max()
+    arg9 = '--min_intensity';
+    arg10 = min_intensity; % minimum relative intensity of the spectral lines to be found
+    arg11 = '--ion_num';
+    arg12 = ion_num;
+    arg13 = '--n';    
+    arg14 = NIST_samples; % number of spectral lines to be found in the NIST database
 
     % Execute the python script with the arguments defined above
     % Example: 
     % python.exe .\NIST_API\API_NIST_v3.py 426 dataFe --element Fe --low_w 425.5 --high_w 584.5 --min_intensity 20 --ion_num 1 --n 3
     
     % @@@@ Up to here
+    if isempty(element)
+        python_command_nist = sprintf('%spython.exe .\\NIST_API\\API_NIST_v3.py %d %s %s %d %s %d %s %d %s %d %s %d', ...
+        python_location, arg1, arg2, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14);
+    else
+        python_command_nist = sprintf('%spython.exe .\\NIST_API\\API_NIST_v3.py %d %s %s %s %s %d %s %d %s %d %s %d %s %d', ...
+        python_location, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14);
+    end
 
-    python_command_nist = sprintf('%spython.exe .\\NIST_API\\API_NIST_v3.py %d %s %s %d %s %d %s %s %s %s', ...
-    python_location, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10)
-    disp('Please wait until the script is done scrapping data...');
-    runScript = system(python_command_nist);
-    waitfor(runScript);
-    disp('Python script for '+peakWL+'# spectra done!');
+    disp('Please wait until the script is done collecting data...');
+    [status, result] = system(python_command_nist); % add an output argument to the system function
+    if status == 0 % check the exit status of the command
+        disp(['Database for ' num2str(avg_x_peak) ' nm spectra done!']);
+    else
+        disp('Error running the python script!');
+        disp(result); % display the error message if there is an error
+    end
 
     % @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    % Uncomment 6 upper lines and comment lower lines to use arguments from command line
+    % Uncomment upper lines and comment lower lines to use arguments from command line
     % @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
     % disp('Please wait until the script is done scrapping data...');
     % runScript = pyrunfile("NIST_API/API_NIST_v3.py", element="", low_w=arg4, high_w=arg6, min_intensity=arg8, ion_num=arg11, line=arg1, n=arg10, filename=arg2);
     % waitfor(runScript);
-    % disp('Python script for '+peakWL+'# spectra done!');
+    % disp('Python script for '+peakWL+'.csv spectra done!');
     % @@@@ Down to here
 end
 %
