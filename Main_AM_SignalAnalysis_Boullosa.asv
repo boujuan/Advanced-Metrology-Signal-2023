@@ -389,21 +389,18 @@ function browseNIST(wl_idx, avg_x_peak, min_intensity, NIST_samples, python_loca
     
     % @@@@ Up to here
 
-    python_command_nist = sprintf('%spython.exe .\\NIST_API\\API_NIST_v3.py %d %s %s %d %s %d %s %s %s %s', ...
-    python_location, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10)
-    disp('Please wait until the script is done scrapping data...');
-    runScript = system(python_command_nist);
-    waitfor(runScript);
-    disp('Python script for '+peakWL+'# spectra done!');
+    % python_command_nist = sprintf('%spython.exe .\\NIST_API\\API_NIST_v3.py %d %s %s %d %s %d %s %s %s %s', ...
+    % python_location, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+    % runScript = system(python_command_nist);
 
     % @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    % Uncomment 6 upper lines and comment lower lines to use arguments from command line
+    % Uncomment 3 upper lines and comment lower lines to use arguments from command line
     % @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-    % disp('Please wait until the script is done scrapping data...');
-    % runScript = pyrunfile("NIST_API/API_NIST_v3.py", element="", low_w=arg4, high_w=arg6, min_intensity=arg8, ion_num=arg11, line=arg1, n=arg10, filename=arg2);
-    % waitfor(runScript);
-    % disp('Python script for '+peakWL+'# spectra done!');
+% disp('Please wait until the script is done scrapping data...');
+% runScript = pyrunfile("NIST_API/API_NIST_v3.py", element="", low_w=arg4, high_w=arg6, min_intensity=arg8, ion_num=arg11, line=arg1, n=arg10, filename=arg2);
+% waitfor(runScript);
+% disp('Python script for '+peakWL+'# spectra done!');
     % @@@@ Down to here
 end
 %

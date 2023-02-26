@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup as bs
 import io
 import urllib.parse
+import sys
 
 # ====================== IMPORTANT NOTE: ========================================== #
 # You might need to install pip_system_certs (apart from all the other dependencies) 
@@ -138,8 +139,10 @@ def search_n_nearest_lines(data_frame, line, number_of_lines):
 
 # Main function that parses arguments, retrieves data, cleans it and saves it to a csv file
 if __name__ == '__main__':
+    # @@@@@ Up to Here
+    
     parser = initParser()
-    args = parser.parse_args()
+    args = parser.parse_args()    
     data_frame = retrieve_data(args.element, args.low_w, args.high_w, args.min_intensity)
     data_frame = clean_intensity(data_frame)
     data_frame = line_threshold(data_frame, args.min_intensity)
@@ -147,3 +150,24 @@ if __name__ == '__main__':
     data_frame = filter_ion(data_frame, args.ion_num)
     lines_df = search_n_nearest_lines(data_frame, args.line, args.n)
     lines_df.to_csv('Data/'+args.filename+'.csv') # Saves data to a csv file in Data folder
+    
+    # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    # Uncomment upper lines and comment lower lines to use arguments from command line
+    # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    # @ Takes arguments from matlab "pyrunfile" function:
+    # low_w2 = float(low_w)
+    # high_w2 = float(high_w)
+    # min_intensity2 = float(min_intensity)
+    # ion_num = [ion_num]
+    # ion_num2 = [int(i) for i in ion_num]
+    # line2 = float(line)
+    # n2 = float(n)
+    
+    # data_frame = retrieve_data(element, low_w2, high_w2, min_intensity2)
+    # data_frame = clean_intensity(data_frame)
+    # data_frame = line_threshold(data_frame, min_intensity2)
+    # data_frame = filter_nan_values(data_frame)
+    # data_frame = filter_ion(data_frame, ion_num2)
+    # lines_df = search_n_nearest_lines(data_frame, line2, n2)
+    # lines_df.to_csv('Data/'+filename+'.csv') # Saves data to a csv file in Data folder
+    # @@@@@ Down to here
