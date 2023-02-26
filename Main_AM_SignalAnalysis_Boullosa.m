@@ -296,24 +296,25 @@ disp(avg_x_peak)
 % Define the target wavelength and the NIST filename
 [~, idx] = max(abs(avg_max_value)); % Gets the index of the maximum peak of the signal
 peakWL = avg_x_peak(idx); % Gets the wavelength of the maximum peak of the signal
-targetWL = fix(peakWL); % Convert to string 
-NIST_filename = strcat("NIST_dB_", num2str(targetWL), "_nm");
+targetWL = fix(peakWL); % Rounds the wavelength to the nearest integer
+NIST_filename = sprintf('NIST_dB_%d_nm', targetWL);
 min_intensity = '10';
 NIST_samples = '100';
 
-arg1 = num2str(targetWL); % Target wavelength to search for in the NIST database
+arg1 = peakWL; % Target wavelength to search for in the NIST database
 arg2 = NIST_filename; % filename to save the data to (without extension)
 arg3 = '--low_w';
-arg4 = num2str(min(avg_x_peak)); % low wavelength range to search for spectral lines
+arg4 = min(avg_x_peak); % low wavelength range to search for spectral lines
 arg5 = '--high_w';
-arg6 = num2str(max(avg_x_peak)); % high wavelength range to search for spectral lines
+arg6 = max(avg_x_peak); % high wavelength range to search for spectral lines
 arg7 = '--min_intensity';
-arg8 = num2str(min_intensity); % minimum relative intensity of the spectral lines to be found
+arg8 = min_intensity; % minimum relative intensity of the spectral lines to be found
 arg9 = '--n';
-arg10 = num2str(NIST_samples); % number of spectral lines to be found in the NIST database
+arg10 = NIST_samples; % number of spectral lines to be found in the NIST database
 
 % Execute the python script with the arguments defined above
-python_command_nist = strcat(python_location,"python.exe .\NIST_API\API_NIST_v3.py ", arg1, " ", arg2, " ", arg3, " ", arg4, " ", arg5, " ", arg6, " ", arg7, " ", arg8, " ", arg9, " ", arg10);
+python_command_nist = sprintf('%spython.exe .\\NIST_API\\API_NIST_v3.py %d %s %s %d %s %d %s %s %s %s', ...
+    python_location, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
 system(python_command_nist);
 % Example: 
 % python.exe .\NIST_API\API_NIST_v3.py 426 dataFe --element Fe --low_w 425.5 --high_w 584.5 --min_intensity 20 --ion_num 1 --n 3
