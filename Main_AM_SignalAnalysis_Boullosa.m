@@ -354,9 +354,9 @@ disp("========================================");
 %==========================================================================
 % Load NIST data from csv files
 disp('Loading NIST data...');
-numCols = 2; % Number of columns in the csv file
+numCols = 2; % Number of columns to prealocate
 
-% Preallocate NIST_data cell (rows: NIST_samples, columns: 8, depth: numImpPeaks=4)
+% Preallocate NIST_data cell (rows: NIST_samples, columns: 2, depth: numImpPeaks=4)
 NIST_data = cell(NIST_samples, numCols, numImpPeaks);
 
 % Read the csv files and store the data in NIST_data cell
