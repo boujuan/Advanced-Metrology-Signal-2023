@@ -76,6 +76,7 @@ def retrieve_data(element, low_w, high_w, min_intensity):
     # NIST website url with parameters from url_params
     site = "https://physics.nist.gov/cgi-bin/ASD/lines1.pl?" + urllib.parse.urlencode(url_params)
     # print(site)
+    # uncomment upper line to get URL of the website with parameters for access in browser
 
     site = site.format(element, low_w, high_w, min_intensity)
     respond = requests.get(site)
