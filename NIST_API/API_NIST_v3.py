@@ -12,6 +12,7 @@ import urllib.parse
 # Not sure about other OS.
 
 ########################################### BEGIN CODE ###################################################################
+#
 # Example usage:
 #
 # python.exe .\API_NIST_v3.py 426.5 data --element Fe --n 10 --low_w 425 --high_w 584 --ion_num 1 2 --min_intensity 10
@@ -19,6 +20,8 @@ import urllib.parse
 # This will retrieve data for Iron (Fe element), filter out lines with wavelength outside the range of 425-584 nm,
 # filter out lines with ionization stages other than 1 or 2, filter out lines with intensity below 10,
 # find the 10 nearest lines to a wavelength of 426.5 nm, and save the results to a file named 'data.csv'.
+#
+##########################################################################################################################
 
 # Parses arguments from command line
 def initParser():
