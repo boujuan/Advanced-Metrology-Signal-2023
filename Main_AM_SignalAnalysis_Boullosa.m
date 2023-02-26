@@ -292,9 +292,10 @@ disp(avg_x_peak)
 % Data is saved into a csv file in \Data as "NIST_dB_{wavelength of line}_nm.csv"
 min_intensity = '10';
 NIST_samples = '100';
-for i=1:size(avg_max_value,1)-4 % For each spectrum (only count the first 4)
-    [~, wl_idx] = max(abs(avg_max_value(i))); % Gets the index of the maximum peak of the signal
-    browseNIST(avg_x_peak(wl_idx), min_intensity, NIST_samples); % Browse the NIST database for the spectral line and saves it into a csv
+[~, wl_idx] = max(abs(avg_max_value)); % Gets the index of the maximum peak of the signal
+
+for i=1:size(avg_max_value,2)-4 % For each spectrum (only count the first 4)    
+    browseNIST(wl_idx, avg_x_peak, min_intensity, NIST_samples, python_location); % Browse the NIST database for the spectral line and saves it into a csv
 end
 
 % ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■%
@@ -352,18 +353,20 @@ end
 %==========================================================================
 %% - BROWSE NIST DATABASE -
 %==========================================================================
-function browseNIST(peakWL, min_intensity, NIST_samples)
+function browseNIST(wl_idx, avg_x_peak, min_intensity, NIST_samples, python_location)
 % Function to browse the NIST database and find the spectral lines
 %
 %   Input:
 %      peakWL: the wavelength of the peak to search for in the NIST database
+%      avg_x_peak: the average wavelength of the spectral lines to be found
 %      min_intensity: the minimum relative intensity of the spectral lines to be found
 %      NIST_samples: the number of spectral lines to be found in the NIST database
 %   Output:
 %      Creates a csv file in /Data with the spectral lines found in the NIST database
 %      For the given wavelengths and minimum intensity, samples
-
-    NIST_filename = sprintf('NIST_dB_%d_nm', fix(peakWL));
+    
+    peakWL = avg_x_peak(wl_idx);
+    NIST_filename = sprintf('NIST_dB_%d_nm', fix(peakWL));    
     
     arg1 = peakWL; % Target wavelength to search for in the NIST database
     arg2 = NIST_filename; % filename to save the data to (without extension)
