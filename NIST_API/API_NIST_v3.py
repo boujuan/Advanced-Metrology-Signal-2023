@@ -6,8 +6,8 @@ from bs4 import BeautifulSoup as bs
 import io
 import urllib.parse
 
-# IMPORTANT NOTE: 
-# You might need to install pip_system_certs 
+# ====================== IMPORTANT NOTE: ========================================== #
+# You might need to install pip_system_certs (apart from all the other dependencies) 
 # (pip install pip_system_certs) to fix SSL certificate error on Windows 10/11. 
 # Not sure about other OS.
 
