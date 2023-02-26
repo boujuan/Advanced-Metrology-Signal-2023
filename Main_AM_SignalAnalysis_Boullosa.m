@@ -324,6 +324,7 @@ min_intensity = 10; % Minimum intensity of the spectral line to be considered
 NIST_samples = 100; % Number of samples to be taken from the NIST database into the csv file 
 element = ''; % Element to be searched in the NIST database (leave empty to search for all elements)
 ion_num = 1; % Ion number of the element to be searched in the NIST database (leave empty to search for all ion numbers)
+searchRange = 5; % Range of the wavelength to be searched in the NIST database (in +/- nm)
 [~, wl_idx] = max(abs(avg_max_value)); % Gets the index of the maximum peak of the whole signal
 
 disp("========================================");
@@ -332,7 +333,7 @@ if length(file_list_NIST) >= numImpPeaks
     user_input = input(['NIST data already found for all ' num2str(numImpPeaks) ' peaks. Do you want to regenerate the data? (y/n): '], 's');
     if strcmpi(user_input, 'y')
         for i=1:numImpPeaks % For each spectrum (only count the first 4)    
-            browseNIST(i,avg_x_peak(i), min_intensity, NIST_samples, python_location, element, ion_num); % Browse the NIST database for the spectral line and saves it into a csv    
+            browseNIST(i,avg_x_peak(i), min_intensity, NIST_samples, python_location, element, ion_num, searchRange); % Browse the NIST database for the spectral line and saves it into a csv    
         end
         disp('...');
         disp('Success! All data regenerated in Data/NIST_dB_{wavelength}_nm.csv');
@@ -341,7 +342,7 @@ if length(file_list_NIST) >= numImpPeaks
     end
 else
     for i=1:numImpPeaks % For each spectrum (only count the first 4)    
-        browseNIST(i,avg_x_peak(i), min_intensity, NIST_samples, python_location, element, ion_num); % Browse the NIST database for the spectral line and saves it into a csv    
+        browseNIST(i,avg_x_peak(i), min_intensity, NIST_samples, python_location, element, ion_num, searchRange); % Browse the NIST database for the spectral line and saves it into a csv    
     end
     disp('...');
     disp('Success! All data collected in Data/NIST_dB_{wavelength}_nm.csv');
