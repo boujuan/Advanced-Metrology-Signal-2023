@@ -11,9 +11,7 @@ To identify which elements correspond to some of the lines in the data, the prog
 To install and use this project, you need to have Matlab and Python installed on your computer. Follow these steps:
 
 1. Clone this repository to your local machine or download latest release.
-
 2. Open Matlab and navigate to the folder where you cloned this repository.
-
 3. Please make sure at the beginning of the matlab file (lines 43 and 44), the path to your local python executable is correctly stablished.
    If using anaconda installed in the default location, leave it as follows:
    ```
@@ -24,9 +22,7 @@ To install and use this project, you need to have Matlab and Python installed on
    ```
     python_location = 'C:\Python\';
    ```
-
 4. Run Main_AM_SignalAnalysis_Boullosa.m file in Matlab. This will load the noisy data file Sig_para_Novo.mat and perform multiple operations.
    Furthermore, this will also run API_NIST_v3.py provided the python location is set up correctly. This will query NIST database and dowload 
-   relevant Spectral data in the /DATA folder as .csv files. Then the main Matlab script will resume and perform the rest of the analysis.
-   
+   relevant Spectral data in the /DATA folder as .csv files. Then the main Matlab script will resume and perform the rest of the analysis.   
 5. This repository also includes a Report in PDF format in the folder /Report. Please check it for more information.
