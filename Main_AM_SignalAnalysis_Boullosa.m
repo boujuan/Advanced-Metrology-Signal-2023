@@ -356,7 +356,7 @@ disp("========================================");
 disp('Loading NIST data...');
 numCols = 3; % Number of columns to prealocate
 
-% Preallocate NIST_data cell (rows: NIST_samples, columns: 2, depth: numImpPeaks=4)
+% Preallocate NIST_data cell (rows: NIST_samples, columns: 3, depth: numImpPeaks=4)
 NIST_data = cell(NIST_samples, numCols, numImpPeaks);
 
 % Read the csv files and store the data in NIST_data cell
@@ -376,11 +376,15 @@ for i = 1:numImpPeaks % For each spectrum (only count the first 4)
     % Store the data in the cell array 
     NIST_data(:, :, i) = data_cols;
     % Rows: Samples (1-100), 
-    % Column 1: Element name, Column 2: Wavelength, Column 3: Intensity 
+    % Column 1: Element name, Column 2: Wavelength, Column 3: Intensity , Column 4: Wavelength difference, Column 5: Intensity difference
     % 3rd Dimension (1-4): Spectral Line
 end
+% Combine data
+NIST_data_combined = combine_NIST_data(NIST_data);
 
-wavelengthValue = double(NIST_data{1, 2, 1}); % Convert cell to double example
+% Compare NIST data with Spectral Lines and find the best match for each spectral line
+[element_identified, error_match] = find_matched_element(NIST_data_combined, avg_x_peak(1:numImpPeaks)', abs(avg_max_value(1:numImpPeaks))');
+disp('Element identified: '+ element_identified + ', with a match error score of: ' + error_match);
 
 % ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■%
 %% =================== FUNCTIONS ======================================= %%
@@ -505,4 +509,55 @@ function browseNIST(i,avg_x_peak, min_intensity, NIST_samples, python_location, 
     % disp('Python script for '+peakWL+'.csv spectra done!');
     % @@@@ Down to here
 end
+%==========================================================================
+%% - COMBINE SPECTRAL DATA -
+%==========================================================================
+function NIST_data_unique = combine_NIST_data(NIST_data)
+    % Concatenate NIST_data along third dimension
+    NIST_data_concat = [NIST_data(:,:,1); NIST_data(:,:,2); NIST_data(:,:,3); NIST_data(:,:,4)];
+    NIST_data_string = string(NIST_data_concat);
+    NIST_data_unique = unique(NIST_data_string,'rows');
+end
+%==========================================================================
+%% - IDENTIFY ELEMENTS USING NIST DATA -
+%==========================================================================
+function [matched_element, min_error]  = find_matched_element(NIST_data_unique, x_peaks, x_peaks_max)
+% Function to find the closest match between the spectral lines in NIST_data_unique and the spectral lines in x_peaks/x_peaks_max
 %
+%   Input:
+%      NIST_data_unique: the unique spectral lines found in the NIST database
+%      x_peaks: the wavelengths of the spectral lines to be found
+%      x_peaks_max: the relative intensities of the spectral lines to be found
+%
+%   Output:
+%      matched_element: the element with the closest match to the spectral lines in x_peaks/x_peaks_max
+%      min_error: the error between the matched element and the spectral lines in x_peaks/x_peaks_max
+
+    % Convert the numerical values in NIST_data_unique from strings to double
+    wavelengths = str2double(NIST_data_unique(:,2));
+    intensities = str2double(NIST_data_unique(:,3));
+    
+    % Initialize variables for storing the closest match
+    min_error = inf;
+    matched_index = -1;
+    error1 = 0;
+    error2 = 0;
+    
+    % Loop over each element in NIST_data_unique
+    for i = 1:size(NIST_data_unique, 1)
+        % Calculate the error between the current element and x_peaks/x_peaks_max
+        error1 = sum((wavelengths(i) - x_peaks).^2);
+        % error2 = sum((intensities(i) - x_peaks_max).^2);
+        error = error1 + error2;
+        
+        % Update the closest match if the error is smaller than the current minimum
+        if error < min_error
+            min_error = error;
+            matched_index = i;
+        end
+    end
+    
+    % Return the matched element and its corresponding wavelength and intensity values
+    matched_element = NIST_data_unique(matched_index, 1);
+end
+    
