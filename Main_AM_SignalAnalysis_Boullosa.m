@@ -336,7 +336,7 @@ if length(file_list_NIST) >= numImpPeaks
             browseNIST(i,avg_x_peak(i), min_intensity, NIST_samples, python_location, element, ion_num, searchRange); % Browse the NIST database for the spectral line and saves it into a csv    
         end
         disp('...');
-        disp('Success! All data regenerated in Data/NIST_dB_{wavelength}_nm.csv');
+        disp('Success! All data regenerated in Data/NIST_dB_{wavelength}_pm.csv');
     else
         disp('>> Skipping NIST data generation...');
     end
