@@ -6,7 +6,9 @@ The program is written in Matlab and includes several functions that perform dif
 
 After analyzing the data, the program generates several plots that display the cleaned spectra, the identified peaks, and the fitted Gaussian curves. It also includes a summary table that lists the positions, heights, and parameters of the peaks.
 
-To identify which elements correspond to some of the lines in the data, the program uses the python script to query the NIST Atomic Spectra Database and retrieve relevant atomic spectra. It then compares the positions of the lines in the data with the positions of the lines in the atomic spectra and identifies the closest match. The program outputs a table that lists the identified elements and their corresponding lines in the data.
+To identify which elements correspond to some of the lines in the data, the program uses the python script to query the NIST Atomic Spectra Database and retrieve relevant atomic spectra. It then compares the positions of the lines in the data with the positions of the lines in the atomic spectra and identifies the closest match. The program outputs a table that lists the identified elements and their corresponding lines in the data. 
+
+Finally the program calculates the sum of the squared differences between each corresponding value of the values of wavelength and intensity in the database with the ones in the spectral lines in the data and calculates the error from these values to give the veredict and decide which chemical element from the list is most accurate.
 
 To install and use this project, you need to have Matlab and Python installed on your computer. Follow these steps:
 
