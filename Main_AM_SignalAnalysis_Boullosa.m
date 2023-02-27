@@ -650,7 +650,7 @@ function [matched_element, min_error]  = find_matched_element(NIST_data_unique, 
         
         % Update the closest match if the error is smaller than the current minimum
         if error < 5.8
-            disp("error: " + error + "element:" + NIST_data_unique(i, 1));
+            disp("error: " + error + ", element:" + NIST_data_unique(i, 1));
         end
         if error < min_error            
             min_error = error;
