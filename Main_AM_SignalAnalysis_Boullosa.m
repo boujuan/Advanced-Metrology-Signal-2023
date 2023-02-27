@@ -64,17 +64,36 @@ num_curves = size(raw_spectra, 1);
 spectrogram = raw_spectra; % !Left it without detrending due to
 %  weird asymptotes happening with correction later
 
-% define timestep (wavelength_resolution in this case) 
-% and sampling frequency
+% define timestep (wavelength_resolution in this case) and sampling frequency
 wavelength_resolution = wavelength(2) - wavelength(1);
 frequency = 1/wavelength_resolution;
 disp("Wavelength resolution:");
 disp(wavelength_resolution)
 
+% Cut out unevent data from the extremes
+wavelength_cut_idx = find_indices(wavelength, [400.22,599.74]);
+wavelength = wavelength(wavelength_cut_idx(1):wavelength_cut_idx(2));
+spectrogram = spectrogram(:,wavelength_cut_idx(1):wavelength_cut_idx(2));
+
+% Display mean of each spectrum
+spectrum_mean = mean(spectrogram(1:5,:), 2);
+disp("Mean of each spectrum:");
+disp(spectrum_mean)
+
 % Display variance of each spectrum
 spectrum_var = var(spectrogram(1:5,:), 0, 2); 
 disp("Variance of each spectrum:");
 disp(spectrum_var)
+
+% Display skewness of each spectrum
+spectrum_skewness = skewness(spectrogram(1:5,:), 0, 2);
+disp("Skewness of each spectrum:");
+disp(spectrum_skewness)
+
+% Display kurtosis of each spectrum
+spectrum_kurtosis = kurtosis(spectrogram(1:5,:), 0, 2);
+disp("Kurtosis of each spectrum:");
+disp(spectrum_kurtosis)
 
 %==========================================================================
 %% Plotting the signal
@@ -85,6 +104,7 @@ xlabel('Wavelegth (nm)');
 ylabel('Amplitude (a. u.)');
 title("Signal");
 legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5');
+grid on;
 
 %==========================================================================
 %% Find the peaks in the spectrum and plot them
@@ -102,6 +122,8 @@ negPeaksLoc = zeros(numSpectra, maxPeaksPerSpectrum);
 % peak finding -currently 3-points moving average-
 spectrum_smooth = smoothdata(spectrogram, 2, 'movmean', 3);
 
+figure( 'Name', "Peaks" );
+plot(wavelength, spectrogram);
 hold on
 for i = 1:numSpectra
     % Find positive peaks in the spectrum
@@ -234,11 +256,32 @@ title("Corrected Signal Detrended");
 legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5');
 
 %==========================================================================
+%% Clean up the signal
+%==========================================================================
+% Clean up the signal by removing the noise
+[cleaned_spectra, SNR] = clean_up_spectra(corrected_signal_detrended);
+figure( 'Name', "Cleaned-up spectra" );
+plot(wavelength, corrected_signal_detrended(1,:));
+hold on;
+plot(wavelength, cleaned_spectra(1,:));
+xlabel('Wavelegth (nm)');
+ylabel('Amplitude (a. u.)');
+title("Cleaned up spectrum");
+legend('Noisy Data', 'De-noised Data');
+grid on;
+
+for i=1:numSpectra
+    disp("Spectrum " + i + " SNR = " + SNR(i));
+end
+
+%==========================================================================
 %% Find a gaussian fit for the peaks
 %==========================================================================
 % Defines the ranges where the gaussian peaks of the spectral lines are
 % pressent in wavelength values (nm)
-ranges = [424.66 425.44; 425.66 426.42; 426.8 427.54; 427.9 428.6; 439.88 440.56; 446.48 447.06; 523.04 523.5; 583.46 583.96];
+
+ranges = [424.7 425.36; 425.72 426.38; 426.86 427.48; 427.96 428.52; 439.94 440.48; 446.55 447; 523.06 523.38; 583.54 583.92]
+
 % Find indices of these range values using the created function
 % find_indices. Returns a x by 2 array.
 sl_indices = find_indices(wavelength, ranges);
@@ -277,7 +320,7 @@ for i = 1:num_subplots
     
     % Extract x and y values around the peak
     x_data = wavelength(sl_indices(sl_index, 1):sl_indices(sl_index, 2));
-    y_data = corrected_signal_detrended(spectrum_index,sl_indices(sl_index, 1):sl_indices(sl_index, 2));
+    y_data = cleaned_spectra(spectrum_index,sl_indices(sl_index, 1):sl_indices(sl_index, 2));
     
     % Fit the data with a gaussian function
     % startPoint is the initial guess for the algorithm.
@@ -389,6 +432,54 @@ disp('Element identified: '+ element_identified + ', with a match error score of
 % ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■%
 %% =================== FUNCTIONS ======================================= %%
 % ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■%
+%==========================================================================
+%% - CLEAN UP NOISE FROM SPECTRA AND CALCULATE SNR -
+%==========================================================================
+function [cleaned_spectra, SNR] = clean_up_spectra(spectra)
+    % clean_up_spectra(spectra)
+    %   Clean up the noise from the spectra by subtracting the estimated noise from the broken 5th signal
+    %
+    %  Input:
+    %      spectra: 5xN matrix of spectra
+    %  Output:
+    %      cleaned_spectra: 5xN matrix of spectra with noise removed
+    
+    % Subtract the mean value of the 5th spectrum to remove any offset  
+    cleaned_spectra = spectra - mean(spectra(5,:));
+
+    % Calculate the standard deviation of each spectrum
+    std_spectra = std(spectra,0,2);
+
+    % Estimate the noise level in each spectrum
+    % noise_level = std_spectra(5,:) ./ std_spectra(1:5,:);
+
+    % Calculate the signal-to-noise ratio of each spectrum (SNR)
+    SNR = mean(cleaned_spectra(1:4,:),2) ./ std_spectra(5,:);
+
+    % Subtract the estimated noise level from each of the other spectra
+    % cleaned_spectra = cleaned_spectra - std_spectra .* noise_level;
+
+    
+    % Calculate the noise threshold
+    noise_threshold = max(abs(spectra(5,:)))+mean(cleaned_spectra(1:4,:),1)
+
+    % disp(noise_threshold);
+    % Set any values below the noise threshold to zero
+    for i=1:size(cleaned_spectra,1)-1
+        for j=1:size(cleaned_spectra,2)
+            if abs(cleaned_spectra(i,j)) < noise_threshold(i)
+                cleaned_spectra(i,j) = 0;
+            end
+        end
+    end
+
+    % Remove Spurious Data
+    % Find columns with only one non-zero value
+    single_nonzero_cols = find(sum(cleaned_spectra(1:4,:)~=0,1)==1);
+    % Set those non-zero values to 0
+    cleaned_spectra(1:4,single_nonzero_cols) = 0;
+end
+%==========================================================================
 %% - GAUSSIAN FIT -
 %==========================================================================
 function [fitresult, gof] = gaussianFit(x_data, y_data, startPoint)
@@ -402,17 +493,17 @@ function [fitresult, gof] = gaussianFit(x_data, y_data, startPoint)
 %      fitresult : a fit object representing the fit.
 %      gof : structure with goodness-of fit info.
 
-[xData, yData] = prepareCurveData( x_data, y_data);
+    [xData, yData] = prepareCurveData( x_data, y_data);
 
-% Set up fit type and parameters
-ft = fittype( 'gauss1' );
-opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
-opts.Display = 'Off';
-opts.Lower = [-Inf -Inf 0];
-opts.StartPoint = startPoint;
+    % Set up fit type and parameters
+    ft = fittype( 'gauss1' );
+    opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
+    opts.Display = 'Off';
+    opts.Lower = [-Inf -Inf 0];
+    opts.StartPoint = startPoint;
 
-% Fit model to the data using the previous parameters
-[fitresult, gof] = fit( xData, yData, ft, opts );
+    % Fit model to the data using the previous parameters
+    [fitresult, gof] = fit( xData, yData, ft, opts );
 end
 %==========================================================================
 %% - FIND WAVELENGTH INDICES -
@@ -428,15 +519,15 @@ function sl_indices = find_indices(wavelength_axis, ranges)
 %       sl_indices: a matrix of the starting and ending indices of the spectral
 %       lines within the specified ranges
 
-sl_indices = zeros(size(ranges, 1), 2); % Preallocate the output matrix
+    sl_indices = zeros(size(ranges, 1), 2); % Preallocate the output matrix
 
-    for i = 1:size(ranges, 1)
-        % Find indices within the range
-        sl_sub_indices = find((wavelength_axis >= ranges(i, 1)) & (wavelength_axis <= ranges(i, 2)));
-        
-        % Assign the starting and ending indices
-        sl_indices(i, :) = [sl_sub_indices(1), sl_sub_indices(end)];
-    end
+        for i = 1:size(ranges, 1)
+            % Find indices within the range
+            sl_sub_indices = find((wavelength_axis >= ranges(i, 1)) & (wavelength_axis <= ranges(i, 2)));
+            
+            % Assign the starting and ending indices
+            sl_indices(i, :) = [sl_sub_indices(1), sl_sub_indices(end)];
+        end
 end
 %==========================================================================
 %% - BROWSE NIST DATABASE -
