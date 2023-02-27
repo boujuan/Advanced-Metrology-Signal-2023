@@ -99,7 +99,7 @@ disp(spectrum_kurtosis)
 %% Plotting the signal
 %==========================================================================
 figure( 'Name', "Initial Plot" );
-plot(wavelength, spectrogram);
+plot(ds_wl_range, raw_spectra);
 xlabel('Wavelegth (nm)');
 ylabel('Amplitude (a. u.)');
 title("Signal");
@@ -127,19 +127,24 @@ plot(wavelength, spectrogram);
 hold on
 for i = 1:numSpectra
     % Find positive peaks in the spectrum
-    [peaksFound, loc_posPeaks] = findpeaks(spectrum_smooth(i,:), 'MinPeakProminence', 0.5,'MinPeakHeight', 1.5,'Threshold', 0.01);
+    [peaksFound, loc_posPeaks] = findpeaks(spectrum_smooth(i,:), 'MinPeakProminence', 0.5,'MinPeakHeight', 377.95,'Threshold', 0.02);
     numPeaksFound = numel(peaksFound);
     peaks(i, 1:numPeaksFound) = peaksFound;
     peaksLoc(i, 1:numPeaksFound) = loc_posPeaks;
     plot(wavelength(peaksLoc(i,1:numPeaksFound)), peaks(i,1:numPeaksFound), 'rv', 'MarkerFaceColor', 'r');
     
     % Find negative peaks in the spectrum
-    [negPeaksFound, loc_negPeaks] = findpeaks(-spectrum_smooth(i,:), 'MinPeakProminence', 0.2, 'Threshold', 0.001);
+    [negPeaksFound, loc_negPeaks] = findpeaks(-spectrum_smooth(i,:), 'MinPeakProminence', 0.2, 'Threshold', 0.005);
     numNegPeaksFound = numel(negPeaksFound);
     negPeaks(i, 1:numNegPeaksFound) = -negPeaksFound;
     negPeaksLoc(i, 1:numNegPeaksFound) = loc_negPeaks;
     plot(wavelength(negPeaksLoc(i,1:numNegPeaksFound)), negPeaks(i,1:numNegPeaksFound), 'g^', 'MarkerFaceColor', 'g');
 end
+xlabel('Wavelegth (nm)');
+ylabel('Amplitude (a. u.)');
+title("Peaks");
+legend('Spectrum 1', 'Spectrum 2', 'Spectrum 3', 'Spectrum 4', 'Spectrum 5','Positive Peaks', 'Negative Peaks');
+grid on;
 hold off
 
 %==========================================================================
