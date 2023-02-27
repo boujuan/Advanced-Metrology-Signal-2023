@@ -228,8 +228,10 @@ warning('off', 'MATLAB:polyfit:RepeatedPointsOrRescale');
 p = polyfit(x(~isnan(y)), y(~isnan(y)), degree);
 y_fit = polyval(p, x); % evaluate the polynomial at each wavelength
 
+% disp('Polynomial Fit:'+ p');
+
 figure( 'Name', "Polynomial Fit" );
-plot(wavelength, spectrogram);
+plot(wavelength, spectrogram(1,:));
 hold on
 plot(x, y_fit, 'LineWidth',2, 'Color', 'r', 'LineStyle', '--');
 title("Polynomial Fit");
@@ -647,7 +649,10 @@ function [matched_element, min_error]  = find_matched_element(NIST_data_unique, 
         error = error1 + error2;
         
         % Update the closest match if the error is smaller than the current minimum
-        if error < min_error
+        if error < 5.8
+            disp("error: " + error + "element:" + NIST_data_unique(i, 1));
+        end
+        if error < min_error            
             min_error = error;
             matched_index = i;
         end
