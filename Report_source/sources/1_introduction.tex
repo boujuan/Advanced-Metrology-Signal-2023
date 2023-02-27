@@ -1,0 +1,5 @@
+In this document, I present the detailed analysis of data belonging to an emission and absorption spectral signal recorded using prism spectroscopy. This analysis was performed using Matlab. The analysis involves
+several steps, beginning with a standard signal analysis to pre-process and clean the data. Then I performed a peak finding algorithm in order to identify the spectral lines. To obtain a better a better estimate of the continuum curve, I removed such peaks from it to create a calibration curve that allowed me to accurately fit a polynomial function and flatten the spectra.
+Finally, I fitted Gaussian curves to the different peaks of the spectra in order to determine the element it belongs to, using the NIST database as a reference.
+
+To carry out this analysis, I developed a Matlab tool with an accompanying Python script that fully automates the entire process and provide the necessary visualizations such as plots to aid with the result interpretation. 

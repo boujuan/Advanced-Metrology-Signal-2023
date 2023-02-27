@@ -1,0 +1,171 @@
+\documentclass[12pt,oneside,a4paper,english]{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin2]{inputenc}
+\usepackage[margin=2.25cm,headheight=26pt,includeheadfoot]{geometry}
+\usepackage[english]{babel}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{titlesec}
+\usepackage{titling}
+\usepackage[framed, numbered]{matlab-prettifier}
+\usepackage{changepage}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{caption}
+\usepackage{tocloft}
+\usepackage{setspace}
+\usepackage{multirow}
+\usepackage{titling}
+\usepackage{float}
+\usepackage{comment}
+\usepackage{booktabs}
+\usepackage{indentfirst}
+\usepackage{lscape}
+\usepackage{booktabs,caption}
+\usepackage[flushleft]{threeparttable}
+\usepackage[english]{nomencl}
+\usepackage{xcolor}
+\usepackage{lipsum}
+
+
+% --- set footer and header ---
+\pagestyle{fancy}
+\fancyhf{}
+
+\setlength{\parindent}{2em}
+\title{Advanced Metrology} % to reference as \title, dont use \maketitle
+\makeatletter\let\Title\@title\makeatother
+
+
+
+\lstset{language=Matlab,
+style=Matlab-editor,
+basicstyle=\normalsize\mlttfamily,
+numbers=left,
+numberstyle={\scriptsize\color{black}},			% size of the numbers
+numbersep=0.5cm											
+}
+
+\newlist{steps}{enumerate}{1}
+\setlist[steps, 1]{leftmargin=1.5cm,label = Step \arabic*:}
+\renewcommand{\headrulewidth}{1pt}
+\renewcommand{\footrulewidth}{1pt}
+
+%\lhead{\Title}
+\rhead{\nouppercase{\rightmark}}
+\lhead{\Title}
+\rfoot{\includegraphics[height=1.25cm]{root/logo_long.png}} % right header logo
+\setlength\headheight{16pt}
+\setlength{\footskip}{50pt}
+\lhead{\Title} %rightH title
+\cfoot{\thepage}
+
+% --- End of page settings ---
+
+
+
+\begin{document}
+\pagenumbering{roman} 
+\input{sources/0_frontpage.tex}
+
+\newpage
+\doublespacing
+%\addcontentsline{toc}{section}{Table of Contents}
+\renewcommand{\baselinestretch}{1}\normalsize
+\tableofcontents
+\renewcommand{\baselinestretch}{1}\normalsize
+%\singlespacing
+\thispagestyle{fancy} % force page style
+
+\newpage
+\pagenumbering{arabic} 
+\fancyfoot[C]{Page \thepage\ of \pageref{EndOfText}}
+
+\section{Introduction} \label{ch1}
+\input{sources/1_introduction.tex} 
+
+
+
+\section{Basic data analysis} \label{ch1}
+\input{sources/2_basic_data_analysis}
+\section{Advanced data analysis} \label{ch1}
+\input{sources/3_advanced_data_analysis} 
+\section{Conclusion} \label{ch1}
+\input{sources/4_conclusion} 
+
+\label{EndOfText}
+
+\newpage
+\pagenumbering{Roman} 
+\addcontentsline{toc}{section}{List of Figures}
+\fancyfoot[C]{Page \thepage\ of \pageref{endOfDoc}}
+\listoffigures
+\thispagestyle{fancy}
+
+\newpage
+\addcontentsline{toc}{section}{List of Tables}
+\listoftables
+\thispagestyle{fancy}
+
+\newpage
+\addcontentsline{toc}{section}{References}
+\bibliography{document.bib} 
+\bibliographystyle{ieeetr}
+
+
+\newpage
+\section{Appendix} \label{ch6}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 1\textwidth ]{figures/gaus_sl_1.eps}
+    \caption{Gauss Spectral line 1.(absorption) }
+    \label{fig:Figure 13}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 1\textwidth ]{figures/gaus_sl_2.eps}
+    \caption{Gauss Spectral line 2.(absorption) }
+    \label{fig:Figure 14}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 1\textwidth ]{figures/gaus_sl_3.eps}
+    \caption{Gauss Spectral line 3.(absorption) }
+    \label{fig:Figure 15}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 1\textwidth ]{figures/gaus_sl_4.eps}
+    \caption{Gauss Spectral line 4.(absorption) }
+    \label{fig:Figure 16}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 1\textwidth ]{figures/gaus_sl_5.eps}
+    \caption{Gauss Spectral line 5.(absorption) }
+    \label{fig:Figure 17}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 1\textwidth ]{figures/gaus_sl_6.eps}
+    \caption{Gauss Spectral line 6.(absorption) }
+    \label{fig:Figure 18}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 1\textwidth ]{figures/gaus_sl_7.eps}
+    \caption{Gauss Spectral line 7.(emission) }
+    \label{fig:Figure 19}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 1\textwidth ]{figures/gaus_sl_8.eps}
+    \caption{Gauss Spectral line 8.(absorption) }
+    \label{fig:Figure 20}
+\end{figure}
+\label{endOfDoc}
+\end{document}
